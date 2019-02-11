@@ -43,7 +43,7 @@ public class StudentDatabase extends Database {
 			System.out.println("------------------------------------------------------------------------------------");
 				
 		} catch (ClassNotFoundException cnfe) {
-			System.out.print("\nERROR CLASS: ");
+			System.out.print("\nCONNECTION ERROR CLASS: ");
 			System.out.println(cnfe.getMessage() + "\n");
 			System.err.println(cnfe.getCause());
 			// cnfe.printStackTrace();
@@ -69,21 +69,21 @@ public class StudentDatabase extends Database {
 	// FUNDAMENTAL DATABASE OPERATIONS =========================================================================
 	@Override
 	public boolean insertRecord() {
-		// TODO Auto-generated method stub
+		// TODO: insertRecord()
 		return false;
 	}
 
 	
 	@Override
 	public boolean deleteRecord() {
-		// TODO Auto-generated method stub
+		// TODO: deleteRecord()
 		return false;
 	}
 
 	
 	@Override
 	public ResultSet readRecord() {
-		// TODO Auto-generated method stub
+		// TODO: readRecord()
 		return null;
 	}
 	
@@ -103,14 +103,14 @@ public class StudentDatabase extends Database {
 			
 			// SQL TO CREATE STUDENT TABLE
 			SQL  =	"CREATE TABLE " + studentDatabaseTableName + " ("  +
-					"id INTEGER not NULL, " +
-					"studId VARCHAR(9), " +
-					"firstName VARCHAR(255), " +
-					"lastName VARCHAR(255), " +
-					"course VARCHAR(5), " +
-					"yearLevel INTEGER, " +
-					"unitsEnrolled INTEGER, " +
-					"PRIMARY KEY ( id )" +
+					" id INTEGER not NULL, " 	+
+					" studId VARCHAR(9), " 		+
+					" firstName VARCHAR(255), " +
+					" lastName VARCHAR(255), " 	+
+					" course VARCHAR(5), " 		+
+					" yearLevel INTEGER, " 		+
+					" unitsEnrolled INTEGER, " 	+
+					" PRIMARY KEY ( id )" 		+
 					")";
 			
 			// System.out.println(SQL);
@@ -142,24 +142,25 @@ public class StudentDatabase extends Database {
 	
 	
 	// DELETE EXISTING TABLES WITH MATCHING NAMES (deletes table if it matches the provided name by the user, studentDatabaseTableName)
-	public boolean deleteDuplicateTables() {		
+	public boolean deleteDuplicateTable() {		
 		try {
 			DatabaseMetaData meta = conn.getMetaData();
 			ResultSet res = meta.getTables(null, null, studentDatabaseTableName, null);
 			
 			// SCANS THE RETURNED RESULTS FROM DATABASE
 			while(res.next()) {
-				if(studentDatabaseTableName != null && studentDatabaseTableName.equals(res.getString("TABLE_NAME"))) { // returns TRUE if the name of an existing table matches the parameter given 
+				if(studentDatabaseTableName != null && studentDatabaseTableName.equalsIgnoreCase(res.getString("TABLE_NAME"))) { // returns TRUE if the name of an existing table matches the parameter given
+					System.out.println("Deleted " + res.getString("TABLE_NAME").toLowerCase());
 					return true;
 				}
 			}
 			
 		} catch (SQLException sqle) {
-			// TODO: handle SQL exception
+			// TODO: deleteDuplicateTable() - handle SQL exception
 			sqle.printStackTrace();
 			
 		} catch (Exception e) {
-			// TODO: handle exception
+			// TODO: deleteDuplicateTable() - handle exception
 			e.printStackTrace();
 		}
 		
