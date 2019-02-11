@@ -18,7 +18,7 @@ public class View{
 		
 		do {
 			
-			ss[index].setId(reader.readLine());
+			ss[index].setStudentId(reader.readLine()); //updated setId() to setStudentId()
 			ss[index].setLastName(reader.readLine());
 			ss[index].setFirstName(reader.readLine());
 			ss[index].setCourse(reader.readLine());
