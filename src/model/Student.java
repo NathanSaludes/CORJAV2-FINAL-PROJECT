@@ -4,31 +4,42 @@ import java.sql.*;
 
 public class Student {
 	
-	private String id;
-	private String lastName;
-	private String firstName;
-	private String course;
-	private int yearLevel;
-	private int unitsEnrolled;
+	// STUDENT BEAN MEMBERS
+	private int 	unitsEnrolled;
+	private int 	yearLevel;
+	private String 	firstName;
+	private String 	lastName;
+	private String 	course;
+	private String 	studentId;
 	
-	private Connection conn = getDBConnection();
-	
-	
+	// STUDENT BEAN CONSTRUCTORS
 	public Student() {
-		this.id = null;
-		this.lastName = null;
-		this.firstName = null;
-		this.course = null;
-		this.yearLevel = 0;
-		this.unitsEnrolled = 0;
+		this.unitsEnrolled 	= 0;
+		this.yearLevel 		= 0;
+		this.firstName 		= null;
+		this.lastName 		= null;
+		this.course 		= null;
+		this.studentId 		= null;
 	}
 	
-	
-	public String getId() {
-		return id;
+	public Student(String id, String lastName, String firstName, String course, int yearLevel, int unitsEnrolled) {
+		this.unitsEnrolled 	= unitsEnrolled;
+		this.yearLevel 		= yearLevel;
+		this.firstName 		= firstName;
+		this.lastName 		= lastName;
+		this.course 		= course;
+		this.studentId 		= id;
 	}
-	public void setId(String id) {
-		this.id = id;
+
+
+
+	// =============================================================================================================================================
+	// SETTERS AND GETTERS
+	public String getStudentId() {
+		return studentId;
+	}
+	public void setStudentId(String id) {
+		this.studentId = id;
 	}
 	public String getLastName() {
 		return lastName;
@@ -62,67 +73,5 @@ public class Student {
 	}
 	
 	
-	// DATABASE CONFIG
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost:3306/";
 	
-	// ESTABLISH DATABASE CONNECTION
-	private Connection getDBConnection() {
-		
-		Connection  conn = null;
-		
-		try {
-			// Register JDBC driver
-			Class.forName(JDBC_DRIVER);
-			
-			// Open a connection
-			System.out.println("Connecting to a selected database...");
-			conn = DriverManager.getConnection(DB_URL, "root", "");
-			System.out.println("Connected database successfully...");
-			
-		} catch (SQLException sqle) {
-			sqle.printStackTrace(); // HANDLE JDBC ERRORS
-		} catch (Exception e) {
-			e.printStackTrace();	// HANDLE "Class.forName" ERRORS
-		}
-		
-		System.out.print("CONNECTION STATUS: ");
-			if(conn != null)
-				System.out.print("VALID");
-			else
-				System.err.print("INVALID");
-			
-		return conn;
-	}
-	
-	// CREATE TABLE
-	public boolean createStudentTable() {
-		Statement 	stmt = null;
-		String 		SQL  = null;
-		
-		try {
-			// Execute query
-			System.out.println("Creating 'REGISTRATION' table...");
-			stmt = this.conn.createStatement();
-			
-			SQL  =	"CREATE TABLE REGISTRATION ("		  +
-					" id 			INTEGER not NULL,	" +
-					" studId 		VARCHAR(9),			" +
-					" firstName 	VARCHAR(255),		" +
-					" lastName 		VARCHAR(255),		" +
-					" course 		VARCHAR(5),			" +
-					" yearLevel		INTEGER,			" +
-					" unitsEnrolled INTEGER,			" +
-					" PRIMARY KEY ( id )"				  +
-					")";
-			
-			stmt.executeUpdate(SQL);
-			return true;
-			
-		} catch (SQLException sqle) {
-			sqle.printStackTrace();
-		}
-		
-		return false;
-	}
 }
