@@ -43,19 +43,19 @@ public class StudentDatabase extends Database {
 			System.out.println("------------------------------------------------------------------------------------");
 				
 		} catch (ClassNotFoundException cnfe) {
-			System.out.print("\nERROR: ");
+			System.out.print("\nERROR CLASS: ");
 			System.out.println(cnfe.getMessage() + "\n");
 			System.err.println(cnfe.getCause());
 			// cnfe.printStackTrace();
 			
 		} catch (SQLException sqle) {
-			System.out.print("\nERROR: ");
+			System.out.print("\nERROR SQL: ");
 			System.err.println(sqle.getMessage() + "\n");
 			System.err.println(sqle.getCause());
 			// sqle.printStackTrace();
 			
 		} catch (Exception e) {
-			System.out.print("\nERROR: ");
+			System.out.print("\nERROR EXCEPTION: ");
 			System.err.println(e.getMessage() + "\n");
 			System.err.println(e.getCause());
 			// e.printStackTrace();
