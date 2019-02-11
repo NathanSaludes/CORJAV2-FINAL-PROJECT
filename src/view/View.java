@@ -7,7 +7,6 @@ import model.Student;
 public class View{
 
 	public void commandA() throws IOException {
-		
 		// initial db entry
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
