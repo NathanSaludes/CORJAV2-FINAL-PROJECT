@@ -7,6 +7,7 @@ public class StudentDatabase extends Database {
 	private static 	String studentDatabaseTableName 	= null;	// DEFAULT STUDENT DATABASE TABLE NAME
 	private 		Connection conn 					= null; // DATABASE CONNECTION OBJECT
 	
+	
 	// DATABASE CONFIGURATION
 	private static String JDBC_DRIVER 	= "com.mysql.jdbc.Driver";
 	private static String DB_NAME		= "saludes-se21-db";
@@ -15,11 +16,11 @@ public class StudentDatabase extends Database {
 	
 	// CONSTRUCTOR
 	public StudentDatabase(String tableName) {
-		 System.out.println("DATABASE: "	+ DB_NAME);
-		 System.out.println("DB_URL: " 	+ DB_URL);
+		System.out.println("DATABASE: "	+ DB_NAME);
+		System.out.println("DB_URL: "	+ DB_URL);
 		
 		studentDatabaseTableName = tableName;
-		 conn = getConnection();
+		conn = getConnection();
 	}
 	
 	
@@ -112,9 +113,12 @@ public class StudentDatabase extends Database {
 					"PRIMARY KEY ( id )" +
 					")";
 			
-//			System.out.println(SQL);
+			// System.out.println(SQL);
 			
 			stmt.executeUpdate(SQL);
+			
+			System.out.println("Successfully created " + studentDatabaseTableName + " table");
+			
 			return true;
 			
 		} catch (SQLException sqle) {
