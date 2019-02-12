@@ -1,10 +1,13 @@
 package view;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Scanner;
 
 import model.Student;
 
-public class View{
+public class View {
 
 	public void commandA() throws IOException {
 		// initial db entry
@@ -95,5 +98,20 @@ public class View{
 	public void commandQ() {
 		// terminates the application
 		System.out.println("\nProgram terminated. Thank you for using the system.");
+	}
+	
+	
+	
+	
+	// DEBUGGING METHODS ===========================================================================================================================================
+	public void printInputFileData(Scanner inputFile, String fileName) throws InterruptedException {
+		System.out.println("Printing input file...\n\n");
+		Thread.sleep(2000);
+		System.out.println("=============================================== " + fileName + " ====================================================");
+		while(inputFile.hasNextLine()) {
+			System.out.println("# " + inputFile.nextLine().toString());
+		}
+		
+		System.out.println("==================================================================================================================");
 	}
 }
