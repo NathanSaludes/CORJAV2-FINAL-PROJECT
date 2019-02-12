@@ -23,6 +23,7 @@ public class App {
 		// CREATE A DATABASE CONNECTION
 		StudentDatabase database = new StudentDatabase(tableName);
 		
+		
 		// READ INPUT FILE
 		/*try {
 			InputFileReader ifr = new InputFileReader(inputFilePath);
@@ -34,12 +35,7 @@ public class App {
 			e.printStackTrace();
 		}*/
 		
-	
-							
-			
-		// STUDENT OBJECT SAMPLE
-//		Student student = new Student("201502034","Saludes","Nathaniel","BS-SE",4,123);
-		
+		database.closeResources();
 	}
 
 }

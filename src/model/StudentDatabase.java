@@ -5,7 +5,7 @@ import java.sql.*;
 public class StudentDatabase extends Database {
 	
 	private static 	String studentDatabaseTableName 	= null;	// DEFAULT STUDENT DATABASE TABLE NAME
-	private 		Connection conn 					= null; // DATABASE CONNECTION OBJECT
+	private static	Connection conn 					= null; // DATABASE CONNECTION OBJECT
 	
 	
 	// DATABASE CONFIGURATION
@@ -23,7 +23,11 @@ public class StudentDatabase extends Database {
 		
 		studentDatabaseTableName = tableName;
 		
+		// Establish a connection upon instantiation
 		conn = getConnection();
+		
+		// Create a new table
+		createStudentTable();
 	}
 	
 	
@@ -45,8 +49,6 @@ public class StudentDatabase extends Database {
 			
 			System.out.println("DATABASE CONNECTION STATUS: Valid");
 			hr(1);
-			
-			createStudentTable();
 				
 		} catch (ClassNotFoundException cnfe) {
 			System.out.print("\nDRIVER ERROR: ");
@@ -109,8 +111,8 @@ public class StudentDatabase extends Database {
 		Statement 	stmt = null;
 		String 		SQL  = null;
 		
-		try {
-			// DELETE EXISTING TABLES IN DATABASE FIRST
+		try {			
+			// DELETE EXISTING TABLES FIRST
 			deleteDuplicateTable();
 			
 			// SAMPLE OUTPUT: "Creating <DB_NAME> table"
@@ -199,7 +201,17 @@ public class StudentDatabase extends Database {
 	// CLOSE ALL OPENED RESOURCES
 	@Override
 	public boolean closeResources() {
-		// TODO: Close all open resources
+		try {
+			if(!conn.isClosed() && conn.isValid(0)) {
+				conn.close();				
+				System.out.println("# Closing db connection...");
+				return true;
+			}
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return false;
 	}
 	
