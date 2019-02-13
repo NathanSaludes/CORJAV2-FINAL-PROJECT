@@ -14,7 +14,7 @@ public abstract class Database {
 	public abstract Connection getConnection();
 	
 	// FOR INSERTING RECORDS TO THE DATABASE
-	public abstract boolean insertRecord();
+	public abstract boolean insertRecord(Student student);
 	
 	// FOR DELETING A SINGLE RECORD TO THE DATABASE
 	public abstract boolean deleteRecord();

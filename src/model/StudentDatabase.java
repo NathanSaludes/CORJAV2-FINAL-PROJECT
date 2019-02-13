@@ -1,6 +1,5 @@
 package model;
 
-import java.net.ConnectException;
 import java.sql.*;
 
 public class StudentDatabase extends Database {
@@ -48,7 +47,7 @@ public class StudentDatabase extends Database {
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 			System.out.println(e.getCause());
-//			e.printStackTrace();
+			// e.printStackTrace();
 		} catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
 			System.out.println("CAUSE: " + e.getCause());
@@ -56,7 +55,7 @@ public class StudentDatabase extends Database {
 			System.out.println("# Unable to connect to database...");
 			System.out.println("# Unable to create database table...");
 			System.out.println("\n --- PLEASE RESART THE PROGRAM --- ");
-//			e.printStackTrace();
+			// e.printStackTrace();
 		}
 		
 	}
@@ -120,8 +119,14 @@ public class StudentDatabase extends Database {
 
 	// FUNDAMENTAL DATABASE OPERATIONS ==========================================================================================================================
 	@Override
-	public boolean insertRecord() {
-		// TODO: insertRecord()
+	public boolean insertRecord(Student student) {
+		String SQL 		= 	"INSERT INTO " + studentDatabaseTableName + 
+							" (studId, firstName, lastName, course, yearLevel, unitsEnrolled) values (?,?,?,?,?,?)";
+		
+		if(!conn.isClosed()) {
+			PreparedStatement pStmt = get
+		}
+		
 		return false;
 	}
 

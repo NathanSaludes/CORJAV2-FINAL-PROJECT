@@ -14,7 +14,7 @@ public class App {
 	public static String logFilePath	= null;
 	
 	private static String JDBC_DRIVER	= "com.mysql.jdbc.Driver";
-	private static String DB_NAME		= "saludes-se21-db";
+	private static String DB_NAME		= "student";
 	private static String DB_URL		= "jdbc:mysql://localhost:3306/" + DB_NAME;
 	
 	
@@ -32,7 +32,7 @@ public class App {
 		
 		
 		// READ INPUT FILE
-		try {
+		/*try {
 			InputFileReader ifr = new InputFileReader(inputFilePath);
 			ifr.readFile();
 			
@@ -40,7 +40,9 @@ public class App {
 			fnfe.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
+		
+		database.closeResources();
 	}
 
 }
