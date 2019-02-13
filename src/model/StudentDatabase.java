@@ -1,34 +1,69 @@
 package model;
 
+import java.net.ConnectException;
 import java.sql.*;
 
 public class StudentDatabase extends Database {
 	
-	private static 	String studentDatabaseTableName 	= null;	// DEFAULT STUDENT DATABASE TABLE NAME
+	private static 	String studentDatabaseTableName 	= null;	// USER PROVIDED DATABASE TABLE NAME
 	private static	Connection conn 					= null; // DATABASE CONNECTION OBJECT
 	
 	
 	// DATABASE CONFIGURATION
-	private static String JDBC_DRIVER 	= "com.mysql.jdbc.Driver";
-	private static String DB_NAME		= "saludes-se21-db";
-	private static String DB_URL 		= "jdbc:mysql://localhost:3306/" + DB_NAME;
+	private String JDBC_DRIVER	= null;
+	private String DB_NAME		= null;
+	private String DB_URL		= null;
 	
 	
 	// CONSTRUCTOR
-	public StudentDatabase(String tableName) {
+	public StudentDatabase(
+			String JDBC_DRIVER, 
+			String DB_NAME, 
+			String DB_URL, 
+			String tableName
+	){
 		hr(1);
+		// 1) print database configurations
 		System.out.println("# DATABASE CONFIGURATION");
+		System.out.println("JDBC_DRIVER: " + JDBC_DRIVER);
 		System.out.println("DB_NAME: "	+ DB_NAME);
 		System.out.println("DB_URL: "	+ DB_URL);
 		
+		// 2) initialize members
 		studentDatabaseTableName = tableName;
+		this.JDBC_DRIVER	= JDBC_DRIVER;
+		this.DB_NAME		= DB_NAME;
+		this.DB_URL			= DB_URL;
 		
-		// Establish a connection upon instantiation
-		conn = getConnection();
+		hr(1);
 		
-		// Create a new table
-		createStudentTable();
+		// 3) Establish a connection upon instantiation
+		try {
+			conn = getConnection();
+			
+			if(conn.isValid(0)) {
+				createStudentTable();
+			}
+			
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+			System.out.println(e.getCause());
+//			e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println("ERROR: " + e.getMessage());
+			System.out.println("CAUSE: " + e.getCause());
+			hr(1);
+			System.out.println("# Unable to connect to database...");
+			System.out.println("# Unable to create database table...");
+			System.out.println("\n --- PLEASE RESART THE PROGRAM --- ");
+//			e.printStackTrace();
+		}
+		
 	}
+	
+	
+	
+	
 	
 	
 	// GET DATABASE CONNECTION
@@ -43,12 +78,13 @@ public class StudentDatabase extends Database {
 			Class.forName(JDBC_DRIVER);
 				
 			// OPEN A CONNECTION
-			hr(1);
 			System.out.println("# Connecting to database...");
 			databaseConnection = DriverManager.getConnection(DB_URL, "root", "");
 			
 			System.out.println("DATABASE CONNECTION STATUS: Valid");
 			hr(1);
+			
+			
 				
 		} catch (ClassNotFoundException cnfe) {
 			System.out.print("\nDRIVER ERROR: ");
@@ -63,8 +99,7 @@ public class StudentDatabase extends Database {
 			System.out.print("\nSQL ERROR: ");
 			System.out.println(sqle.getMessage() + "\n");
 			System.out.println("CAUSE: " + sqle.getCause());
-			hr(1);
-			System.out.println("DATABASE CONNECTION STATUS: Invalid");
+			System.out.println("\nDATABASE CONNECTION STATUS: Invalid");
 			// sqle.printStackTrace();
 			hr(1);
 			
@@ -90,14 +125,12 @@ public class StudentDatabase extends Database {
 		return false;
 	}
 
-	
 	@Override
 	public boolean deleteRecord() {
 		// TODO: deleteRecord()
 		return false;
 	}
 
-	
 	@Override
 	public ResultSet readRecord() {
 		// TODO: readRecord()
@@ -181,7 +214,7 @@ public class StudentDatabase extends Database {
 				}
 			}
 			
-		} catch (SQLException sqle) {
+		}catch (SQLException sqle) {
 			// TODO: deleteDuplicateTable() - handle SQL exception
 			System.out.print("\nSQL ERROR: ");
 			System.out.println(sqle.getMessage() + "\n");

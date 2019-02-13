@@ -1,15 +1,11 @@
 package controller;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
-
-import view.View;
+import java.io.FileReader;
 
 public class InputFileReader {
 	
-	private String path 	= null;
 	private String fileName = null;
+	private String path 	= null;
 
 	// CONSTRUCTOR
 	public InputFileReader(String path) {
@@ -22,7 +18,8 @@ public class InputFileReader {
 	
 	
 	// READ INPUT FILE DATA
-	public void readFile() throws FileNotFoundException, InterruptedException {
+	/**
+	   	public void readFile() throws FileNotFoundException, InterruptedException {
 		File file = new File(this.path);		
 		Scanner input = new Scanner(file);
 		String line;
@@ -32,11 +29,15 @@ public class InputFileReader {
 		
 		while(input.hasNextLine()) {
 			// TODO: readFile() functionality
+			break;
 			input.nextLine();
 		}
 		
 		// PRINTS CONTENT OF INPUT FILE (For debugging purposes)
 		new View().printInputFileData(input, this.fileName);
+	}*/
+	
+	public void readFile() {
 	}
 	
 	
