@@ -186,8 +186,6 @@ public class StudentDatabaseManager extends Database {
 		}
 	} // delete duplicate table
 
-
-	
 	// FUNDAMENTAL DATABASE OPERATIONS ==========================================================================================================================
 	@Override
 	public boolean insertRecord(Student student) {
