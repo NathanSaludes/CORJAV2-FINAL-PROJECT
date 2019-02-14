@@ -1,10 +1,8 @@
 package controller;
 
-import java.io.FileNotFoundException;
-
-import controller.InputFileReader;
-import model.StudentDatabase;
+import model.Database;
 import model.Student;
+import model.StudentDatabaseManager;
 
 public class App {
 	
@@ -14,7 +12,7 @@ public class App {
 	public static String logFilePath	= null;
 	
 	private static String JDBC_DRIVER	= "com.mysql.jdbc.Driver";
-	private static String DB_NAME		= "student";
+	private static String DB_NAME		= "iacademy";
 	private static String DB_URL		= "jdbc:mysql://localhost:3306/" + DB_NAME;
 	
 	
@@ -25,24 +23,26 @@ public class App {
 		inputFilePath 	= args[1];
 		logFilePath 	= args[2];
 		
-		// CREATE A DATABASE CONNECTION
-		StudentDatabase database = new StudentDatabase(
-			JDBC_DRIVER, DB_NAME, DB_URL, tableName
-		);
-		
-		
-		// READ INPUT FILE
-		/*try {
-			InputFileReader ifr = new InputFileReader(inputFilePath);
-			ifr.readFile();
-			
-		} catch (FileNotFoundException fnfe) {
-			fnfe.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}*/
-		
-		database.closeResources();
+		StudentDatabaseManager DatabaseManager = createDatabaseConnection();
+		readCommandFile(DatabaseManager);
 	}
 
+
+	// ===========================================================================================================================================================
+	// START STUDENT DATABASE OPERATIONS MANAGER
+	public static StudentDatabaseManager createDatabaseConnection() {
+		StudentDatabaseManager database = new StudentDatabaseManager(
+				JDBC_DRIVER,
+				DB_NAME, 
+				DB_URL, 
+				tableName
+		);
+		
+		return database;
+	}
+
+	// READ INPUT COMMAND FILE
+	public static void readCommandFile(StudentDatabaseManager DatabaseManager) {
+		InputCommandFileReader inputReader = new InputCommandFileReader(inputFilePath, DatabaseManager);
+	}
 }

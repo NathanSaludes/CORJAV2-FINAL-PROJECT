@@ -12,17 +12,15 @@ public class Student {
 	private String 	course;
 	private String 	studentId;
 	
-	// STUDENT BEAN CONSTRUCTORS
-	public Student() {
-		this.unitsEnrolled 	= 0;
-		this.yearLevel 		= 0;
-		this.firstName 		= null;
-		this.lastName 		= null;
-		this.course 		= null;
-		this.studentId 		= null;
-	}
-	
-	public Student(String id, String lastName, String firstName, String course, int yearLevel, int unitsEnrolled) {
+	// STUDENT BEAN CONSTRUCTORS	
+	public Student(
+		String id, 
+		String lastName, 
+		String firstName, 
+		String course, 
+		int yearLevel, 
+		int unitsEnrolled
+	){
 		this.unitsEnrolled 	= unitsEnrolled;
 		this.yearLevel 		= yearLevel;
 		this.firstName 		= firstName;

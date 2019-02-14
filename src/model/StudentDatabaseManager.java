@@ -2,9 +2,9 @@ package model;
 
 import java.sql.*;
 
-public class StudentDatabase extends Database {
+public class StudentDatabaseManager extends Database {
 	
-	private static 	String studentDatabaseTableName 	= null;	// USER PROVIDED DATABASE TABLE NAME
+	private static 	String databaseTableName 	= null;	// USER PROVIDED DATABASE TABLE NAME
 	private static	Connection conn 					= null; // DATABASE CONNECTION OBJECT
 	
 	
@@ -15,7 +15,7 @@ public class StudentDatabase extends Database {
 	
 	
 	// CONSTRUCTOR
-	public StudentDatabase(
+	public StudentDatabaseManager(
 			String JDBC_DRIVER, 
 			String DB_NAME, 
 			String DB_URL, 
@@ -29,7 +29,7 @@ public class StudentDatabase extends Database {
 		System.out.println("DB_URL: "	+ DB_URL);
 		
 		// 2) initialize members
-		studentDatabaseTableName = tableName;
+		databaseTableName = tableName;
 		this.JDBC_DRIVER	= JDBC_DRIVER;
 		this.DB_NAME		= DB_NAME;
 		this.DB_URL			= DB_URL;
@@ -40,7 +40,7 @@ public class StudentDatabase extends Database {
 		try {
 			conn = getConnection();
 			
-			if(conn.isValid(0)) {
+			if(conn.isValid(5)) {
 				createStudentTable();
 			}
 			
@@ -49,27 +49,15 @@ public class StudentDatabase extends Database {
 			System.out.println(e.getCause());
 			// e.printStackTrace();
 		} catch (Exception e) {
-			System.out.println("ERROR: " + e.getMessage());
-			System.out.println("CAUSE: " + e.getCause());
-			hr(1);
-			System.out.println("# Unable to connect to database...");
-			System.out.println("# Unable to create database table...");
-			System.out.println("\n --- PLEASE RESART THE PROGRAM --- ");
 			// e.printStackTrace();
 		}
 		
 	}
 	
 	
-	
-	
-	
-	
 	// GET DATABASE CONNECTION
-	@Override
-	public Connection getConnection() {
-		
-		 // CONNECTION OBJECT
+	private Connection getConnection() {
+
 		Connection databaseConnection = null;
 		
 		try {
@@ -83,29 +71,26 @@ public class StudentDatabase extends Database {
 			System.out.println("DATABASE CONNECTION STATUS: Valid");
 			hr(1);
 			
-			
-				
 		} catch (ClassNotFoundException cnfe) {
-			System.out.print("\nDRIVER ERROR: ");
+			System.out.println("# CONNECTION ERROR: DRIVER\n");
 			System.out.println(cnfe.getMessage() + "\n");
-			System.out.println("CAUSE: " + cnfe.getCause());
 			hr(1);
 			System.out.println("\nDATABASE CONNECTION STATUS: Invalid");
 			// cnfe.printStackTrace();
 			hr(1);
 			
 		} catch (SQLException sqle) {
-			System.out.print("\nSQL ERROR: ");
-			System.out.println(sqle.getMessage() + "\n");
-			System.out.println("CAUSE: " + sqle.getCause());
-			System.out.println("\nDATABASE CONNECTION STATUS: Invalid");
+			System.out.println("# CONNECTION ERROR: SQL\n");
+			System.out.println(sqle.getMessage());
+			hr(1);
+			System.out.println("# Unable to access database.");
+			System.out.println("DATABASE CONNECTION STATUS: Invalid");
 			// sqle.printStackTrace();
 			hr(1);
 			
 		} catch (Exception e) {
-			System.out.print("\nERROR: ");
+			System.out.println("CONNECTION ERROR: EXCEPTION\n");
 			System.out.println(e.getMessage() + "\n");
-			System.out.println("CAUSE: " + e.getCause());
 			hr(1);
 			System.out.println("\nDATABASE CONNECTION STATUS: Invalid");
 			// e.printStackTrace();
@@ -113,21 +98,126 @@ public class StudentDatabase extends Database {
 		}
 		
 		return databaseConnection;
-		
 	}
+	
+	// CREATE STUDENT TABLE
+	private void createStudentTable() {
+		Statement 	stmt = null;
+		String 		SQL  = null;
+		
+		try {			
+			// DELETE EXISTING TABLES FIRST
+			deleteDuplicateTable();
+			
+			// SAMPLE OUTPUT: "Creating <DB_NAME> table"
+			System.out.println("# Creating new table, \'" + databaseTableName.toLowerCase() + "\' ...");
+			
+			
+			stmt = conn.createStatement();
+			
+			// SQL TO CREATE STUDENT TABLE
+			SQL  =	"CREATE TABLE " + databaseTableName + " ("  +
+					" id INTEGER NOT NULL AUTO_INCREMENT, " 	+
+					" studId VARCHAR(9), " 		+
+					" firstName VARCHAR(255), " +
+					" lastName VARCHAR(255), " 	+
+					" course VARCHAR(5), " 		+
+					" yearLevel INTEGER, " 		+
+					" unitsEnrolled INTEGER, " 	+
+					" PRIMARY KEY ( id )" 		+
+					")";
+			
+			stmt.executeUpdate(SQL);
+			
+			System.out.println("# Successfully created \'" + databaseTableName.toLowerCase() + "\' table!");
+			hr(1);
+			
+		} catch (SQLException sqle) {
+			System.out.println("# Failed to create a student record...");
+			System.out.print("\nCREATE TABLE ERROR: SQL\n");
+			System.out.println(sqle.getMessage());
+			hr(1);
+			// sqle.printStackTrace();
+		} catch (Exception e) {
+			System.out.print("\nCREATE TABLE ERROR: GENERAL\n");
+			System.out.println(e.getMessage());
+			hr(1);
+			// e.printStackTrace();
+		}
+	} // create student table
+		
+	// DELETE DUPLICATE TABLES
+	private void deleteDuplicateTable() {
+		Statement stmt 	= null;
+		String SQL 		= "DROP TABLE ";
+		
+		try {
+			DatabaseMetaData dmbd = conn.getMetaData();
+			ResultSet res = dmbd.getTables(null, null, "%", null); // RETURNS ALL TABLES
+			stmt = conn.createStatement();
+			
+			// SCANS THE RETURNED RESULTS FROM DATABASE
+			while(res.next()) {
+				if(databaseTableName.equalsIgnoreCase(res.getString("TABLE_NAME"))) {
+					System.out.println("# Found an existing \'" + databaseTableName.toLowerCase() + "\' table!");
+					SQL = SQL.concat(res.getString("TABLE_NAME"));
+					
+					// EXECUTE DROP TABLE QUERY
+					stmt.executeUpdate(SQL);
+					
+					System.out.println("# Dropped \'" + res.getString("TABLE_NAME").toLowerCase() + "\' table...");
+					System.out.println("#");
+				}
+			}
+			
+		} catch (SQLException sqle) {
+			// TODO: deleteDuplicateTable() - handle SQL exception
+			System.out.print("\nSQL ERROR: ");
+			System.out.println(sqle.getMessage() + "\n");
+			System.out.println("CAUSE: " + sqle.getCause());
+			sqle.printStackTrace();
+			hr(1);
+		} catch (Exception e) {
+			System.out.print("\nERROR: ");
+			System.out.println(e.getMessage() + "\n");
+			System.out.println("CAUSE: " + e.getCause());
+			e.printStackTrace();
+			hr(1);
+		}
+	} // delete duplicate table
 
 
+	
 	// FUNDAMENTAL DATABASE OPERATIONS ==========================================================================================================================
 	@Override
 	public boolean insertRecord(Student student) {
-		String SQL 		= 	"INSERT INTO " + studentDatabaseTableName + 
-							" (studId, firstName, lastName, course, yearLevel, unitsEnrolled) values (?,?,?,?,?,?)";
+		PreparedStatement pStmt = null;
 		
-		if(!conn.isClosed()) {
-			PreparedStatement pStmt = get
-		}
+		String SQL =	  "INSERT INTO " + databaseTableName + " (" 
+						+ "studId, firstName, lastName, course, yearLevel, unitsEnrolled) "
+						+ "values (?,?,?,?,?,?)";
 		
-		return false;
+        try {
+            if (conn.isValid(5) && !conn.isClosed()) {
+                pStmt = conn.prepareStatement(SQL);
+                
+                pStmt.setString	(1, student.getStudentId()		);
+                pStmt.setString	(2, student.getFirstName()		);
+                pStmt.setString	(3, student.getLastName()		);
+                pStmt.setString	(4, student.getCourse()			);
+                pStmt.setInt	(5, student.getYearLevel()		);
+                pStmt.setInt	(6, student.getUnitsEnrolled()	);
+                
+                pStmt.executeUpdate();
+                
+                System.out.println("# Successfully created a new student record into the database!");
+                return true;
+            }
+            
+        } catch (SQLException sqle) {
+            System.err.println(sqle.getMessage());
+        }
+        return false;
 	}
 
 	@Override
@@ -142,100 +232,9 @@ public class StudentDatabase extends Database {
 		return null;
 	}
 	
-	
 	// ==========================================================================================================================================================
-	// CREATE STUDENT TABLE
-	public void createStudentTable() {
-		Statement 	stmt = null;
-		String 		SQL  = null;
-		
-		try {			
-			// DELETE EXISTING TABLES FIRST
-			deleteDuplicateTable();
-			
-			// SAMPLE OUTPUT: "Creating <DB_NAME> table"
-			System.out.println("# Creating new table, \'" + studentDatabaseTableName.toLowerCase() + "\' ...");
-			
-			
-			stmt = conn.createStatement();
-			
-			// SQL TO CREATE STUDENT TABLE
-			SQL  =	"CREATE TABLE " + studentDatabaseTableName + " ("  +
-					" id INTEGER not NULL, " 	+
-					" studId VARCHAR(9), " 		+
-					" firstName VARCHAR(255), " +
-					" lastName VARCHAR(255), " 	+
-					" course VARCHAR(5), " 		+
-					" yearLevel INTEGER, " 		+
-					" unitsEnrolled INTEGER, " 	+
-					" PRIMARY KEY ( id )" 		+
-					")";
-			
-			// System.out.println(SQL);
-			
-			stmt.executeUpdate(SQL);
-			
-			System.out.println("# Successfully created \'" + studentDatabaseTableName.toLowerCase() + "\' table!");
-			
-		} catch (SQLException sqle) {
-			System.out.print("\nSQL ERROR: ");
-			System.out.println(sqle.getMessage() + "\n");
-			System.out.println("CAUSE: " + sqle.getCause());
-			sqle.printStackTrace();
-			hr(1);
-		} catch (Exception e) {
-			System.out.print("\nERROR: ");
-			System.out.println(e.getMessage() + "\n");
-			System.out.println("CAUSE: " + e.getCause());
-			e.printStackTrace();
-			hr(1);
-		} finally {
-			hr(1);
-		}
-	}
 	
-	
-	// DELETE EXISTING TABLES WITH MATCHING NAMES (deletes table if it matches the provided name by the user, studentDatabaseTableName)
-	public void deleteDuplicateTable() {
-		Statement stmt 	= null;
-		String SQL 		= "DROP TABLE ";
-		
-		try {
-			DatabaseMetaData dmbd = conn.getMetaData();
-			ResultSet res = dmbd.getTables(null, null, "%", null); // RETURNS ALL TABLES
-			stmt = conn.createStatement();
-			
-			// SCANS THE RETURNED RESULTS FROM DATABASE
-			while(res.next()) {
-				if(studentDatabaseTableName.equalsIgnoreCase(res.getString("TABLE_NAME"))) {
-					System.out.println("# Found an existing \'" + studentDatabaseTableName.toLowerCase() + "\' table!");
-					SQL = SQL.concat(res.getString("TABLE_NAME"));
-					
-					// EXECUTE DROP TABLE QUERY
-					stmt.executeUpdate(SQL);
-					
-					System.out.println("# Dropped \'" + res.getString("TABLE_NAME").toLowerCase() + "\' table...");
-					System.out.println("#");
-				}
-			}
-			
-		}catch (SQLException sqle) {
-			// TODO: deleteDuplicateTable() - handle SQL exception
-			System.out.print("\nSQL ERROR: ");
-			System.out.println(sqle.getMessage() + "\n");
-			System.out.println("CAUSE: " + sqle.getCause());
-			sqle.printStackTrace();
-			hr(1);
-		} catch (Exception e) {
-			System.out.print("\nERROR: ");
-			System.out.println(e.getMessage() + "\n");
-			System.out.println("CAUSE: " + e.getCause());
-			e.printStackTrace();
-			hr(1);
-		}
-	}
 
-	
 	// CLOSE ALL OPENED RESOURCES
 	@Override
 	public boolean closeResources() {

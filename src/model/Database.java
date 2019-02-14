@@ -9,10 +9,6 @@ public abstract class Database {
 	private static String DB_NAME 		= null;
 	private static String DB_URL 		= null;
 	
-	
-	// FOR ESTABLISHING A CONNECTION TO THE DATABASE
-	public abstract Connection getConnection();
-	
 	// FOR INSERTING RECORDS TO THE DATABASE
 	public abstract boolean insertRecord(Student student);
 	
