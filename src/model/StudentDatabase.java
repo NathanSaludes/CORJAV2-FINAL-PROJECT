@@ -123,10 +123,26 @@ public class StudentDatabase extends Database {
 		String SQL 		= 	"INSERT INTO " + studentDatabaseTableName + 
 							" (studId, firstName, lastName, course, yearLevel, unitsEnrolled) values (?,?,?,?,?,?)";
 		
-		if(!conn.isClosed()) {
-			PreparedStatement pStmt = get
+		try {
+			Connection connection = getDBConnection();
+			if (connection != null) {
+				PreparedStatement pstmnt = getDBConnection().prepareStatement(SQL);
+				
+				pstmnt.setString(1, student.getStudentId());
+				pstmnt.setString(2, student.getFirstName());
+				pstmnt.setString(3, student.getLastName());
+				pstmnt.setString(4, student.getCourse());
+				pstmnt.setInt(5, student.getYearLevel());
+				pstmnt.setInt(6, student.getUnitsEnrolled());
+				
+				pstmnt.executeUpdate();
+				return true;
+			} else {
+				throw new SQLException();
+			}			
+		} catch (SQLException sqle) {
+			System.err.println(sqle.getMessage());
 		}
-		
 		return false;
 	}
 
