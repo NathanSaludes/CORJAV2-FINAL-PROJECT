@@ -124,9 +124,9 @@ public class StudentDatabase extends Database {
 							" (studId, firstName, lastName, course, yearLevel, unitsEnrolled) values (?,?,?,?,?,?)";
 		
 		try {
-			Connection connection = getDBConnection();
-			if (connection != null) {
-				PreparedStatement pstmnt = getDBConnection().prepareStatement(SQL);
+//			Connection connection = conn;
+			if (conn != null) {
+				PreparedStatement pstmnt = conn.prepareStatement(SQL);
 				
 				pstmnt.setString(1, student.getStudentId());
 				pstmnt.setString(2, student.getFirstName());
