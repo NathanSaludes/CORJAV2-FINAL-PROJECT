@@ -194,7 +194,7 @@ public class InputCommandFileReader {
 	}
 
 	private void commandL() {
-		DatabaseManager.listAllStudents();
+		DatabaseManager.listAll();
 	}
 
 	

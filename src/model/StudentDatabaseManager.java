@@ -235,20 +235,20 @@ public class StudentDatabaseManager extends Database {
 		return null;
 	}
 	
-	public void listAllStudents() {
+	public void listAll() {
 		PreparedStatement pStmt = null;
 		ResultSet res 			= null;
 		String SQL				= null;
 		
 		try {
 			if (conn.isValid(5) && !conn.isClosed()) {
-				SQL = "SELECT * FROM " + databaseTableName;
 				
+				// print all students
+				SQL = "SELECT * FROM " + databaseTableName;				
                 pStmt = conn.prepareStatement(SQL);
-                
                 res = pStmt.executeQuery();
                 
-                for(int counter=1; res.next(); ++counter) {
+                for(int counter=1; res.next(); counter++) {
                 	System.out.println("\n[" + counter + "]");
                 	System.out.println("ID: " + res.getString("studId"));
                 	System.out.println("Name: " + res.getString("lastName")+", "+res.getString("firstName"));
@@ -259,19 +259,29 @@ public class StudentDatabaseManager extends Database {
                 
                 hr(1);
                 
-                SQL = "SELECT COUNT(*) as numberOfStudents FROM " + databaseTableName;
-                pStmt = conn.prepareCall(SQL);
+                // count the number of total students
+                SQL = "SELECT COUNT(*) as totalStudents FROM " + databaseTableName;
+                pStmt = conn.prepareStatement(SQL);
                 res = pStmt.executeQuery();
                 
-                while(res.next()) {
-                	System.out.println("Total Students Enrolled: " + res.getInt("numberOfStudents"));
+                if(res.next()) {
+                	System.out.println("Total Students Enrolled: " + res.getInt("totalStudents"));
                 }
                 
-                SQL = "SELECT COUNT(*) as numberOfStudents FROM " + databaseTableName;
-                pStmt = conn.prepareCall(SQL);
+                // count total number of cs students
+                SQL = "SELECT COUNT(*) as CS_STUDENTS FROM " + databaseTableName + " WHERE course='BS CS'";
+                pStmt = conn.prepareStatement(SQL);
                 res = pStmt.executeQuery();
                 
-                System.out.println(); 
+                if(res.next()) {
+                	System.out.println("Total Students in CS: " + res.getInt("CS_STUDENTS"));
+                }
+                
+                // count total number of IT students
+                
+                // count total number of IS students
+                
+                
             }
 			
 		} catch(SQLException sqle) {
