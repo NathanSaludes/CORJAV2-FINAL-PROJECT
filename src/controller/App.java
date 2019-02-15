@@ -1,7 +1,5 @@
 package controller;
 
-import model.Database;
-import model.Student;
 import model.StudentDatabaseManager;
 import view.View;
 
@@ -16,18 +14,19 @@ public class App {
 	private static String DB_NAME		= "iacademy";
 	private static String DB_URL		= "jdbc:mysql://localhost:3306/" + DB_NAME;
 	
-	
 	public static void main(String[] args) {
-				
-		// MAIN ARGUMENTS
+		
+		// If main arguments are provided, it will override the application configurations
 		if(args.length == 3) {
 			tableName 		= args[0];
 			inputFilePath 	= args[1];
-			logFilePath 	= args[2];			
+			logFilePath 	= args[2];	
 		} else {
+			// If main arguments are not provided, the application will use the default configuration
 			new View().printDefaultAppConfig(tableName, inputFilePath, logFilePath);
 		}
 		
+		// create a database
 		StudentDatabaseManager DatabaseManager = createDatabaseConnection();
 		
 		if(DatabaseManager.hasValidConnection()) {
@@ -51,6 +50,6 @@ public class App {
 
 	// READ INPUT COMMAND FILE
 	public static void readCommandFile(StudentDatabaseManager DatabaseManager) {
-		InputCommandFileReader inputReader = new InputCommandFileReader(inputFilePath, DatabaseManager);
+		new InputCommandFileReader(inputFilePath, DatabaseManager);
 	}
 }
