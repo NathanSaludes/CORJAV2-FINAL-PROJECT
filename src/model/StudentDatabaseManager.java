@@ -206,9 +206,11 @@ public class StudentDatabaseManager extends Database {
                 pStmt.setInt	(5, student.getYearLevel()		);
                 pStmt.setInt	(6, student.getUnitsEnrolled()	);
                 
-                pStmt.executeUpdate();
+                if(pStmt.executeUpdate() == 1) {
+                	System.out.println("# Successfully inserted a new student record into the database!");                	
+                }
                 
-                System.out.println("# Successfully inserted a new student record into the database!");
+                
                 return true;
             }
             
@@ -235,29 +237,49 @@ public class StudentDatabaseManager extends Database {
 	
 	public void listAllStudents() {
 		PreparedStatement pStmt = null;
-		ResultSet res 	= null;
-		
-		String SQL		= "SELECT * FROM " + databaseTableName;
+		ResultSet res 			= null;
+		String SQL				= null;
 		
 		try {
 			if (conn.isValid(5) && !conn.isClosed()) {
+				SQL = "SELECT * FROM " + databaseTableName;
+				
                 pStmt = conn.prepareStatement(SQL);
                 
                 res = pStmt.executeQuery();
                 
-                while(res.next()) {
-                	System.out.println("Student ID: " + res.getString("studId"));
-                	System.out.println("Last name: " + res.getString("lastName"));
-                	System.out.println("First name: " + res.getString("firstName"));
+                for(int counter=1; res.next(); ++counter) {
+                	System.out.println("\n[" + counter + "]");
+                	System.out.println("ID: " + res.getString("studId"));
+                	System.out.println("Name: " + res.getString("lastName")+", "+res.getString("firstName"));
                 	System.out.println("Course: " + res.getString("course"));
                 	System.out.println("Year Level: " + res.getString("yearLevel"));
-                	System.out.println("Number of Units Enrolled: " + res.getString("unitsEnrolled"));
-                	System.out.println("\n");
+                	System.out.println("Units Enrolled: " + res.getString("unitsEnrolled"));
                 }
+                
+                hr(1);
+                
+                SQL = "SELECT COUNT(*) as numberOfStudents FROM " + databaseTableName;
+                pStmt = conn.prepareCall(SQL);
+                res = pStmt.executeQuery();
+                
+                while(res.next()) {
+                	System.out.println("Total Students Enrolled: " + res.getInt("numberOfStudents"));
+                }
+                
+                SQL = "SELECT COUNT(*) as numberOfStudents FROM " + databaseTableName;
+                pStmt = conn.prepareCall(SQL);
+                res = pStmt.executeQuery();
+                
+                System.out.println(); 
             }
+			
 		} catch(SQLException sqle) {
 			System.out.println("listAllStudents Exception");
 			System.out.println("SQL ERROR: " + sqle.getMessage());
+		} catch(Exception e) {
+			System.out.println("ListAllStudents Exception");
+			System.out.println("ERROR: " + e.getMessage());
 		}
 	}
 	
