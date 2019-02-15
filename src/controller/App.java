@@ -33,8 +33,6 @@ public class App {
 		if(DatabaseManager.hasValidConnection()) {
 			readCommandFile(DatabaseManager);			
 		}
-		
-//		readCommandFile(null);
 	}
 
 

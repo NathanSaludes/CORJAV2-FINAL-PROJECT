@@ -47,23 +47,6 @@ public class View {
 	}
 	
 	public void commandL() {
-		//displays all students enrolled
-		
-		int numberOfTotalStudents = 0;
-		int numberOfSE = 0;
-		int numberOfGD = 0;
-		int numberOfWD = 0;
-		
-		System.out.println("Lists of Students Enrolled ");
-		System.out.println("\n====================== \n\n");
-		
-		// loop through all entries of students in the database
-		
-		System.out.println("\nTotal Students Enrolled: " + numberOfTotalStudents);
-		
-		System.out.println("\nTotal Number of SE: " + numberOfSE);
-		System.out.println("\nTotal Number of GD: " + numberOfGD);
-		System.out.println("\nTotal Number of WD: " + numberOfWD);
 		
 	}
 	
@@ -100,6 +83,10 @@ public class View {
 		System.out.println("\nProgram terminated. Thank you for using the system.");
 	}
 	
+	public void printUserEntry(String input) {
+		System.out.println("USER ENTRY: " + input + "\n");
+	}
+	
 	
 	
 	
@@ -114,9 +101,6 @@ public class View {
 		hr(1);
 	}
 	
-	public void printUserEntry(String input) {
-		System.out.println("USER ENTRY: " + input + "\n");
-	}
 	
 	
 	public void printStudent(Student s) {
@@ -134,10 +118,6 @@ public class View {
 		System.out.println("(Default) INPUT FILE PATH: \"" + inputFile + "\"");
 		System.out.println("(Default) LOG FILE PATH: \"" + logFile + "\"");
 	}
-	
-	
-	
-	
 	
 	// PRINTS HORIZONTAL RULE
 	public static void hr(int style) {

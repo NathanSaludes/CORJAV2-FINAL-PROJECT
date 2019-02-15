@@ -228,8 +228,37 @@ public class StudentDatabaseManager extends Database {
 
 	@Override
 	public ResultSet readRecord() {
-		// TODO: readRecord()
+		/*Statement stmt 	= null;
+		String SQL 		= "SELECT * FROM " + databaseTableName;*/
 		return null;
+	}
+	
+	public void listAllStudents() {
+		PreparedStatement pStmt = null;
+		ResultSet res 	= null;
+		
+		String SQL		= "SELECT * FROM " + databaseTableName;
+		
+		try {
+			if (conn.isValid(5) && !conn.isClosed()) {
+                pStmt = conn.prepareStatement(SQL);
+                
+                res = pStmt.executeQuery();
+                
+                while(res.next()) {
+                	System.out.println("Student ID: " + res.getString("studId"));
+                	System.out.println("Last name: " + res.getString("lastName"));
+                	System.out.println("First name: " + res.getString("firstName"));
+                	System.out.println("Course: " + res.getString("course"));
+                	System.out.println("Year Level: " + res.getString("yearLevel"));
+                	System.out.println("Number of Units Enrolled: " + res.getString("unitsEnrolled"));
+                	System.out.println("\n");
+                }
+            }
+		} catch(SQLException sqle) {
+			System.out.println("listAllStudents Exception");
+			System.out.println("SQL ERROR: " + sqle.getMessage());
+		}
 	}
 	
 	// ==========================================================================================================================================================
@@ -252,13 +281,14 @@ public class StudentDatabaseManager extends Database {
 		return false;
 	}
 	
+	// checks if student database manager has a valid connection
 	public boolean hasValidConnection() {
 		try {
 			if(conn.isValid(5)) {
 				return true;
 			}
 		}catch (Exception e) {
-			System.out.println("ERROR: Not connected to the database. Please try again.");
+			System.out.println("ERROR: Unable to connect to the database. Please check your database configurations.");
 		}
 		
 		return false;

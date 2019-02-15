@@ -32,7 +32,7 @@ public class InputCommandFileReader {
 		System.out.println("FILE NAME: \"" + this.fileName + "\"");
 		View.hr(1);
 		
-		printFileContents();
+		// printFileContents();
 		readFile();
 	}
 	
@@ -42,21 +42,22 @@ public class InputCommandFileReader {
 			
 			System.out.println("# Opening File...Please wait.");
 			System.out.println("# Printing file contents...");
+			
 			// print file contents using the view class
 			this.view.printFileContents(scanner, this.fileName);
 			
 		} catch (FileNotFoundException e) {
 			System.out.println("ERROR: File not found...");
 		}
-		
-		
 	}
 	
 	
-	public void readFile() {		
+	public void readFile() {
+		Scanner scanner = null;
+		
 		// Open file
 		try {
-			Scanner scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
+			scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
 			
 			System.out.println("# Opening File...");
 			System.out.println("# Reading File...");
@@ -67,8 +68,6 @@ public class InputCommandFileReader {
 		} catch (FileNotFoundException e) {
 			System.out.println("ERROR: File not found...");
 		}
-		
-		
 	}
 	
 	public void commandReader(Scanner scanner) {
@@ -110,15 +109,6 @@ public class InputCommandFileReader {
 			}
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	// USER COMMANDS OPERATIONS ======================================================================================
 	private void commandA(Scanner scanner) {		
@@ -175,6 +165,7 @@ public class InputCommandFileReader {
 		
 		// insert student to database
 		DatabaseManager.insertRecord(student);
+		
 		View.hr(1);
 	}
 	
@@ -203,8 +194,7 @@ public class InputCommandFileReader {
 	}
 
 	private void commandL() {
-		// TODO Auto-generated method stub
-		
+		DatabaseManager.listAllStudents();
 	}
 
 	
