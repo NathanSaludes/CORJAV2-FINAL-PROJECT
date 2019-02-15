@@ -1,7 +1,5 @@
 package model;
 
-import java.sql.*;
-
 public class Student {
 	
 	// STUDENT BEAN MEMBERS

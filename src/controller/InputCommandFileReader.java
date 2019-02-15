@@ -56,15 +56,19 @@ public class InputCommandFileReader {
 	public void readFile() {
 		Scanner scanner = null;
 		
-		// Open file
 		try {
+			// open file and set the delimitter to 
 			scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
 			
 			System.out.println("# Opening File...");
 			System.out.println("# Reading File...");
 			View.hr(2);
 			
+			// read user commands
 			commandReader(scanner);
+			
+			// close resources
+			scanner.close();
 			
 		} catch (FileNotFoundException e) {
 			System.out.println("ERROR: File not found...");
@@ -73,8 +77,9 @@ public class InputCommandFileReader {
 	
 	public void commandReader(Scanner scanner) {
 		String input = null;
+		boolean Quit = false; // to stop the loop
 		
-		while(scanner.hasNext()) {
+		while(scanner.hasNext() && !Quit) {
 			switch(input = scanner.next().toString().toUpperCase().trim()) {
 			case "A":
 				this.view.printUserEntry(input);
@@ -102,7 +107,8 @@ public class InputCommandFileReader {
 				break;
 			case "Q":
 				this.view.printUserEntry(input);
-				commandQ();
+				commandQ(scanner);
+				Quit = true;
 				break;
 			default:
 				// skip
@@ -175,8 +181,11 @@ public class InputCommandFileReader {
 		View.hr(1);
 	}
 	
-	private void commandQ() {
-		DatabaseManager.terminateConnection();
+	private void commandQ(Scanner s) {
+		if(DatabaseManager.terminateConnection()) {
+			// print message
+			View.quitCommandExecuted();
+		}
 	}
 
 	private void commandP() {

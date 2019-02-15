@@ -78,9 +78,10 @@ public class View {
 		
 	}
 	
-	public void commandQ() {
+	public static void quitCommandExecuted() {
 		// terminates the application
 		System.out.println("\nProgram terminated. Thank you for using the system.");
+		hr(2);
 	}
 	
 	public void printUserEntry(String input) {
@@ -130,7 +131,7 @@ public class View {
 			break;
 		case 2:
 			System.out.println("==================================================================="
-					+ "======================================================================================================");
+					+ "==========================================================================================================================");
 			break;
 		case 3:
 			System.out.println("___________________________________________________________________"

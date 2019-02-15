@@ -4,11 +4,6 @@ import java.sql.*;
 
 public abstract class Database {
 	
-	// DB CONFIGURATION
-	private static String JDBC_DRIVER 	= null;
-	private static String DB_NAME 		= null;
-	private static String DB_URL 		= null;
-	
 	// FOR INSERTING RECORDS TO THE DATABASE
 	public abstract boolean insertRecord(Student student);
 	

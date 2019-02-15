@@ -356,7 +356,9 @@ public class StudentDatabaseManager extends Database {
 	@Override
 	public boolean terminateConnection() {
 		try {
+			// 1) validate connection
 			if(!conn.isClosed() && conn.isValid(5)) {
+				// 2) close database connection
 				conn.close();				
 				System.out.println("# Closing db connection...");
 				return true;
