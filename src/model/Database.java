@@ -19,5 +19,5 @@ public abstract class Database {
 	public abstract ResultSet readRecord();
 	
 	// FOR CLOSING ALL OPENED RESOURCES
-	public abstract boolean closeResources();
+	public abstract boolean terminateConnection();
 }

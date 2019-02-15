@@ -10,17 +10,18 @@ import view.View;
 
 public class InputCommandFileReader {
 	
-	private StudentDatabaseManager DatabaseManager		= null;
-	private String fileName 							= null;
-	private String filePath 							= null;
-	private File inputCommandFile						= null;
-	private View view									= null;
-	private static Student student						= null;
+	private static StudentDatabaseManager DatabaseManager	= null;
+	private String fileName 								= null;
+	private String filePath 								= null;
+	private File inputCommandFile							= null;
+	private View view										= null;
+	private static Student student							= null;
 
 	// CONSTRUCTOR
 	public InputCommandFileReader(String path, StudentDatabaseManager DatabaseManager) {
+		
 		// Initialize class variables
-		this.DatabaseManager	= DatabaseManager;
+		InputCommandFileReader.DatabaseManager	= DatabaseManager;
 		this.filePath 			= path;
 		this.fileName 			= path.substring(path.lastIndexOf('\\') + 1);
 		this.inputCommandFile	= new File(this.filePath);
@@ -111,9 +112,12 @@ public class InputCommandFileReader {
 	}
 	
 	// USER COMMANDS OPERATIONS ======================================================================================
-	private void commandA(Scanner scanner) {		
+	private void commandA(Scanner scanner) {
+		
+		// determines the index of parameter being taken
 		int parameterIndex;
 		
+		// temporary containers for student model fields
 		String 	firstName		= null;
 		String 	lastName		= null;
 		String 	course			= null;
@@ -121,9 +125,10 @@ public class InputCommandFileReader {
 		int 	unitsEnrolled	= 0;
 		int 	yearLevel		= 0;
 		
+		// get all required inputs for each parameter
 		for(parameterIndex = 1; parameterIndex <= 6 && scanner.hasNext(); parameterIndex++) {
 			switch (parameterIndex) {
-			case 1:
+			case 1: 
 				studentId = scanner.next().trim();
 				break;
 			case 2:
@@ -162,6 +167,7 @@ public class InputCommandFileReader {
 		this.view.printStudent(student);
 		
 		System.out.println("\n# Created a new student!");
+		System.out.println("# Inserting student record into the database...");
 		
 		// insert student to database
 		DatabaseManager.insertRecord(student);
@@ -170,12 +176,11 @@ public class InputCommandFileReader {
 	}
 	
 	private void commandQ() {
-		// TODO Auto-generated method stub
+		DatabaseManager.terminateConnection();
 	}
 
 	private void commandP() {
-		// TODO Auto-generated method stub
-		
+		DatabaseManager.clearTable();
 	}
 
 	private void commandR() {
