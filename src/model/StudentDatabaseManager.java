@@ -118,7 +118,7 @@ public class StudentDatabaseManager extends Database {
 			// SQL TO CREATE STUDENT TABLE
 			SQL  =	"CREATE TABLE " + databaseTableName + " ("  +
 					" id INTEGER NOT NULL AUTO_INCREMENT, " 	+
-					" studId VARCHAR(9), " 		+
+					" studId VARCHAR(15), " 		+
 					" firstName VARCHAR(255), " +
 					" lastName VARCHAR(255), " 	+
 					" course VARCHAR(5), " 		+
@@ -208,13 +208,15 @@ public class StudentDatabaseManager extends Database {
                 
                 pStmt.executeUpdate();
                 
-                System.out.println("# Successfully created a new student record into the database!");
+                System.out.println("# Successfully inserted a new student record into the database!");
                 return true;
             }
             
         } catch (SQLException sqle) {
             System.err.println(sqle.getMessage());
+            System.out.println("# Failed to insert student record into the database.");
         }
+        
         return false;
 	}
 
@@ -247,6 +249,18 @@ public class StudentDatabaseManager extends Database {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return false;
+	}
+	
+	public boolean hasValidConnection() {
+		try {
+			if(conn.isValid(5)) {
+				return true;
+			}
+		}catch (Exception e) {
+			System.out.println("ERROR: Not connected to the database. Please try again.");
+		}
+		
 		return false;
 	}
 	

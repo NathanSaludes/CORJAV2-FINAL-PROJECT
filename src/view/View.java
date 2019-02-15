@@ -104,14 +104,56 @@ public class View {
 	
 	
 	// DEBUGGING METHODS ===========================================================================================================================================
-	public void printInputFileData(Scanner inputFile, String fileName) throws InterruptedException {
-		System.out.println("Printing input file...\n\n");
-		Thread.sleep(2000);
-		System.out.println("=============================================== " + fileName + " ====================================================");
-		while(inputFile.hasNextLine()) {
-			System.out.println("# " + inputFile.nextLine().toString());
+	public void printFileContents(Scanner s, String fileName) {
+		hr(1);
+		System.out.println("# FILE: " + fileName + "\n");
+		while(s.hasNextLine()) {
+			System.out.println("|"+ s.nextLine().toString());
 		}
-		
-		System.out.println("==================================================================================================================");
+		System.out.println("\n# End of file, " + fileName + ".");
+		hr(1);
+	}
+	
+	public void printUserEntry(String input) {
+		System.out.println("USER ENTRY: " + input + "\n");
+	}
+	
+	
+	public void printStudent(Student s) {
+		System.out.println("last name: " + s.getLastName());
+		System.out.println("first name: " + s.getFirstName());
+		System.out.println("student id: " + s.getStudentId());
+		System.out.println("course: " + s.getCourse());
+		System.out.println("year level: " + s.getYearLevel());
+		System.out.println("units enrolled: " + s.getUnitsEnrolled());
+	}
+	
+	public void printDefaultAppConfig(String tableName, String inputFile, String logFile) {
+		System.out.println("# DEFAULT APP CONFIGURATION");
+		System.out.println("(Default) STUDENT DATABASE TABLE NAME: " + tableName);
+		System.out.println("(Default) INPUT FILE PATH: \"" + inputFile + "\"");
+		System.out.println("(Default) LOG FILE PATH: \"" + logFile + "\"");
+	}
+	
+	
+	
+	
+	
+	// PRINTS HORIZONTAL RULE
+	public static void hr(int style) {
+		switch(style) {
+		case 1:
+			System.out.println("-------------------------------------------------------------------"
+					+ "--------------------------------------------------------------------------------------------------------------------------");
+			break;
+		case 2:
+			System.out.println("==================================================================="
+					+ "======================================================================================================");
+			break;
+		default:
+			System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+					+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+			break;
+		}
 	}
 }

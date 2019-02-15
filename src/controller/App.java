@@ -3,13 +3,14 @@ package controller;
 import model.Database;
 import model.Student;
 import model.StudentDatabaseManager;
+import view.View;
 
 public class App {
 	
-	// APP CONFIG
-	public static String tableName 		= null;
-	public static String inputFilePath 	= null;
-	public static String logFilePath	= null;
+	// DEFAULT APP CONFIG
+	public static String tableName 		= "students";
+	public static String inputFilePath 	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testInputFile.txt";
+	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testLogFile.txt";
 	
 	private static String JDBC_DRIVER	= "com.mysql.jdbc.Driver";
 	private static String DB_NAME		= "iacademy";
@@ -19,12 +20,21 @@ public class App {
 	public static void main(String[] args) {
 				
 		// MAIN ARGUMENTS
-		tableName 		= args[0];
-		inputFilePath 	= args[1];
-		logFilePath 	= args[2];
+		if(args.length == 3) {
+			tableName 		= args[0];
+			inputFilePath 	= args[1];
+			logFilePath 	= args[2];			
+		} else {
+			new View().printDefaultAppConfig(tableName, inputFilePath, logFilePath);
+		}
 		
 		StudentDatabaseManager DatabaseManager = createDatabaseConnection();
-		readCommandFile(DatabaseManager);
+		
+		if(DatabaseManager.hasValidConnection()) {
+			readCommandFile(DatabaseManager);			
+		}
+		
+//		readCommandFile(null);
 	}
 
 
