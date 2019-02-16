@@ -1,5 +1,6 @@
 package controller;
 
+import exceptions.StudentNotFoundException;
 import model.StudentDatabaseManager;
 import view.View;
 
@@ -14,7 +15,7 @@ public class App {
 	private static String DB_NAME		= "saludes-se21-db";
 	private static String DB_URL		= "jdbc:mysql://localhost:3306/" + DB_NAME;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws StudentNotFoundException {
 		
 		// If main arguments are provided, it will override the application configurations
 		if(args.length == 3) {
@@ -49,7 +50,7 @@ public class App {
 	}
 
 	// READ INPUT COMMAND FILE
-	public static void readCommandFile(StudentDatabaseManager DatabaseManager) {
+	public static void readCommandFile(StudentDatabaseManager DatabaseManager) throws StudentNotFoundException {
 		new InputCommandFileReader(inputFilePath, DatabaseManager);
 	}
 }

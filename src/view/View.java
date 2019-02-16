@@ -48,6 +48,11 @@ public class View {
 		// commandR
 		
 	}
+	
+	public static void deleteStudentRecordMessage() {
+		// deletes a specific student entry record
+		System.out.println("\nRecord found and successfully deleted");
+	}
 
 	public static void deleteRecordsMessage() {
 		// Erases all records in the database

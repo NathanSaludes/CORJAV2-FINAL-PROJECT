@@ -7,6 +7,7 @@ import java.util.Scanner;
 import model.Student;
 import model.StudentDatabaseManager;
 import view.View;
+import exceptions.StudentNotFoundException;
 
 public class InputCommandFileReader {
 	
@@ -18,7 +19,7 @@ public class InputCommandFileReader {
 	private static Student student							= null;
 
 	// CONSTRUCTOR
-	public InputCommandFileReader(String path, StudentDatabaseManager DatabaseManager) {
+	public InputCommandFileReader(String path, StudentDatabaseManager DatabaseManager) throws StudentNotFoundException {
 		
 		// Initialize class variables
 		InputCommandFileReader.DatabaseManager	= DatabaseManager;
@@ -54,7 +55,7 @@ public class InputCommandFileReader {
 	}
 	
 	
-	public void readFile() {
+	public void readFile() throws StudentNotFoundException {
 		Scanner scanner = null;
 		
 		try {
@@ -77,7 +78,7 @@ public class InputCommandFileReader {
 		}
 	}
 	
-	public void commandReader(Scanner scanner) {
+	public void commandReader(Scanner scanner) throws StudentNotFoundException {
 		String input = null;
 		boolean Quit = false; // to stop the loop
 		
@@ -97,7 +98,7 @@ public class InputCommandFileReader {
 				break;
 			case "D": //search and delete
 				this.view.printUserEntry(input);
-				commandD();
+				commandD(scanner);
 				break;
 			case "R": //generate report
 				this.view.printUserEntry(input);
@@ -211,27 +212,55 @@ public class InputCommandFileReader {
 		{
 			case "ALL":
 				//prints all??
+				DatabaseManager.listAll();
 				break;
 			
 			case "SE":
 				DatabaseManager.listAllByCourse("SE");
 				break;
-		}
-		
-		
-		DatabaseManager.listAll();
+				
+			case "GD":
+				DatabaseManager.listAllByCourse("SE");
+				break;
+			
+			case "WD":
+				DatabaseManager.listAllByCourse("SE");
+				break;
+			
+			default: 
+				//skips
+				System.out.println("Error, criteria choice wrong");
+				break;
+		}	
 		
 	}
 
-	private void commandD() {
+	private void commandD(Scanner scanner)throws StudentNotFoundException {
 		// TODO Auto-generated method stub
 		// search and delete
+		String studId = null;
+		studId = scanner.next().trim();
+		
+		System.out.println("\nPlease wait . . . searching for student record " + studId);
+		boolean result = DatabaseManager.deleteRecord(studId);
+		
+		if (result == true)
+		{
+			//print message record deleted
+			View.deleteStudentRecordMessage();
+		}
+		else {
+			throw new StudentNotFoundException();
+		}
+			
 		
 		
 	}
 
 	private void commandS() {
 		// TODO Auto-generated method stub
+		// search a student entry via studentID or lastName and display full info
+		// readRecords()
 		
 	}
 

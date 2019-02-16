@@ -257,22 +257,26 @@ public class StudentDatabaseManager extends Database {
 			pStmt.executeUpdate();
 			//ResultSet rs = pStmt.executeQuery(SQL);
 			
+			return true;
+			
 		}catch(SQLException se){
 		//Handle errors for JDBC
 		//se.printStackTrace();
 		System.err.println(se.getMessage());
-			
+		return false;
+		
 		}catch(Exception e){
 		 //Handle errors for Class.forName
 		 //e.printStackTrace();
 		System.err.println(e.getMessage());
+		return false;
 		}
 		
-		return false;
 	}
 
 	@Override
 	public ResultSet readRecord(String studIdOrLastName) {
+		// TODO
 		/*Statement stmt 	= null;
 		String SQL 		= "SELECT * FROM " + databaseTableName;*/
 		
@@ -283,15 +287,32 @@ public class StudentDatabaseManager extends Database {
 			PreparedStatement pStmt = null;
 			
 			String SQL =	  "SELECT FROM " + databaseTableName 
-							+ "WHERE studId = ?";
+							+ "WHERE studId = ? OR lastName = ?";
 			
 			pStmt = conn.prepareStatement(SQL);
 			
 			pStmt.setString(1, studIdOrLastName);
+			pStmt.setString(2, studIdOrLastName);
 			
 			pStmt.executeUpdate();
 			
+			ResultSet res = pStmt.executeQuery();
+			
+			if (res.next() == false) {
+				System.out.println("\nRecord not found");
+			}
+			
+			else if (res.next() == true) {
+				System.out.println("\nRecord found! ");
+				System.out.println("\n\nID: " );
+			}
+			
 			System.out.println("\nPlease wait . . . searching for student record " + studIdOrLastName);
+			
+			//if record found
+			
+			
+			
 			
 			//If resultset = null, print("Record not found") ??
 			
@@ -380,6 +401,9 @@ public class StudentDatabaseManager extends Database {
 		
 		try {
 			if (hasValidConnection()) {
+				
+				System.out.println("\nList of Students enrolled: ");
+				System.out.println("\n==============");
 				
 				// print all students
 				SQL = "SELECT * FROM " + databaseTableName;				
