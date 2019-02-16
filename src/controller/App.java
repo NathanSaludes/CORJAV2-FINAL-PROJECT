@@ -7,11 +7,11 @@ public class App {
 	
 	// DEFAULT APP CONFIG
 	public static String tableName 		= "students";
-	public static String inputFilePath 	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testInputFile.txt";
-	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testLogFile.txt";
+	public static String inputFilePath 	= "C:\\Users\\Guest Account\\Desktop\\Github Project Repository\\testInputFile.txt";
+	public static String logFilePath	= "C:\\Users\\Guest Account\\Desktop\\Github Project Repository\\testLogFile.txt";
 	
 	private static String JDBC_DRIVER	= "com.mysql.jdbc.Driver";
-	private static String DB_NAME		= "iacademy";
+	private static String DB_NAME		= "saludes-se21-db";
 	private static String DB_URL		= "jdbc:mysql://localhost:3306/" + DB_NAME;
 	
 	public static void main(String[] args) {

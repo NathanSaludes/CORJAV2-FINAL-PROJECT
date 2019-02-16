@@ -2,6 +2,8 @@ package model;
 
 import java.sql.*;
 
+import view.View;
+
 public class StudentDatabaseManager extends Database {
 	
 	private static 	String databaseTableName 	= null;	// USER PROVIDED DATABASE TABLE NAME
@@ -307,6 +309,67 @@ public class StudentDatabaseManager extends Database {
 		return null;
 	}
 	
+	public void listAllByCourse(String course) {
+		// for command R, search by course 
+		
+		PreparedStatement pStmt = null;
+		ResultSet res 			= null;
+		String SQL				= null;
+		
+		try {
+			if (hasValidConnection()) {
+				
+               //----- course counter -----//
+
+                System.out.println("\nCreating a report for all " + course + " students:");
+                
+             // count the number of total students
+                SQL = "SELECT COUNT(*) AS courseCounter FROM " + databaseTableName + " WHERE course =?";
+                pStmt = conn.prepareStatement(SQL);
+                pStmt.setString(1, course);
+                res = pStmt.executeQuery();
+                
+                System.out.println("\nTotal number of " + course + " students: " + res.getInt("courseCounter"));
+                
+                System.out.println("\n\nList of students enrolled in " + course);
+                hr(2);
+				
+				// print all students
+				SQL = "SELECT * FROM " + databaseTableName + " WHERE course =?";				
+                pStmt = conn.prepareStatement(SQL);
+                pStmt.setString(1, course);
+                res = pStmt.executeQuery();
+                
+ 
+                
+                for(int counter=1; res.next(); counter++) {
+                	System.out.println("\n[" + counter + "]");
+                	System.out.println("ID: " + res.getString("studId"));
+                	System.out.println("Name: " + res.getString("lastName")+", "+res.getString("firstName"));
+                	System.out.println("Course: " + res.getString("course"));
+                	System.out.println("Year Level: " + res.getString("yearLevel"));
+                	System.out.println("Units Enrolled: " + res.getString("unitsEnrolled"));
+                }
+                
+                hr(1);
+                
+               
+                // close resources
+               pStmt.close();
+               res.close();
+            }
+			
+		} catch(SQLException sqle) {
+			System.out.println("listAllStudentsByCourse Exception");
+			System.out.println("SQL ERROR: " + sqle.getMessage());
+		} catch(Exception e) {
+			System.out.println("ListAllStudentsByCourse Exception");
+			System.out.println("ERROR: " + e.getMessage());
+		}
+		
+		
+	}
+	
 	public void listAll() {
 		
 		PreparedStatement pStmt = null;
@@ -350,13 +413,13 @@ public class StudentDatabaseManager extends Database {
                 for(int counter=1; counter <= 3; counter++) {
                 	switch(counter) {
                 	case 1:
-                		stmtParam = "BS CS";
+                		stmtParam = "CS";
                 		break;
                 	case 2:
-                		stmtParam = "BS IT";
+                		stmtParam = "GD";
                 		break;
                 	case 3:
-                		stmtParam = "BS IS";
+                		stmtParam = "WD";
                 		break;
             		default: //skip
             			break;
@@ -417,8 +480,10 @@ public class StudentDatabaseManager extends Database {
 			// 1) validate connection
 			if(!conn.isClosed() && conn.isValid(5)) {
 				// 2) close database connection
-				conn.close();				
-				System.out.println("# Closing db connection...");
+				System.out.println("# Closing database connection...");
+				conn.close();
+				System.out.println("# DB Closed");
+				View.quitCommandMessage();
 				return true;
 			}
 		} catch (SQLException sqle) {

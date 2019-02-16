@@ -39,6 +39,7 @@ public class InputCommandFileReader {
 	
 	public void printFileContents() {
 		try {
+			// TODO: Resource Leak: closeable value for Scanner
 			Scanner scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
 			
 			System.out.println("# Opening File...Please wait.");
@@ -58,6 +59,7 @@ public class InputCommandFileReader {
 		
 		try {
 			// open file and set the delimitter to 
+			// TODO: Resource Leak: closeable value for Scanner
 			scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
 			
 			System.out.println("# Opening File...");
@@ -81,27 +83,27 @@ public class InputCommandFileReader {
 		
 		while(scanner.hasNext() && !Quit) {
 			switch(input = scanner.next().toString().toUpperCase().trim()) {
-			case "A":
+			case "A": //student entry
 				this.view.printUserEntry(input);
 				commandA(scanner);
 				break;
-			case "L":
+			case "L": //display all
 				this.view.printUserEntry(input);
 				commandL();
 				break;
-			case "S":
+			case "S": //search and display
 				this.view.printUserEntry(input);
 				commandS();
 				break;
-			case "D":
+			case "D": //search and delete
 				this.view.printUserEntry(input);
 				commandD();
 				break;
-			case "R":
+			case "R": //generate report
 				this.view.printUserEntry(input);
-				commandR();
+				commandR(scanner);
 				break;
-			case "P":
+			case "P": //erase all records
 				this.view.printUserEntry(input);
 				commandP();
 				break;
@@ -168,6 +170,11 @@ public class InputCommandFileReader {
 				unitsEnrolled
 		);
 		
+		// TODO
+		// check if the studentID is unique based on the records in the database table
+		// if not then its either throw a custom exception for duplicate student entry
+		// or overwrite the existing student record with the latest student record entry
+		
 		
 		// print the student
 		this.view.printStudent(student);
@@ -184,21 +191,42 @@ public class InputCommandFileReader {
 	private void commandQ(Scanner s) {
 		if(DatabaseManager.terminateConnection()) {
 			// print message
-			View.quitCommandExecuted();
+			View.quitCommandMessage();
 		}
 	}
 
 	private void commandP() {
 		DatabaseManager.clearTable();
+		View.deleteRecordsMessage();
 	}
 
-	private void commandR() {
-		// TODO Auto-generated method stub
+	private void commandR(Scanner scanner) {
+		// TODO Generate a report based on given criteria
+		// Criteria "ALL" or by specific course SE/GD/WD
+		String criteriaChoice = null;
+		
+		criteriaChoice = scanner.next().trim();
+		
+		switch (criteriaChoice) 
+		{
+			case "ALL":
+				//prints all??
+				break;
+			
+			case "SE":
+				DatabaseManager.listAllByCourse("SE");
+				break;
+		}
+		
+		
+		DatabaseManager.listAll();
 		
 	}
 
 	private void commandD() {
 		// TODO Auto-generated method stub
+		// search and delete
+		
 		
 	}
 
