@@ -503,7 +503,7 @@ public class StudentDatabaseManager extends Database {
 				return true;
 			}
 		}catch (Exception e) {
-			System.out.println("ERROR: Unable to connect to the database. Please check your database configurations.");
+			// skip
 		}
 		
 		return false;
