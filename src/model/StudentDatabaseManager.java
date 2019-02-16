@@ -223,15 +223,73 @@ public class StudentDatabaseManager extends Database {
 	}
 
 	@Override
-	public boolean deleteRecord() {
+	public boolean deleteRecord(String studId) {
 		// TODO: deleteRecord()
+		// delete via studentId
+		
+		try {
+			PreparedStatement pStmt = null;
+			
+			String SQL =	  "DELETE FROM " + databaseTableName 
+							+ "WHERE studId = ?";
+			
+			pStmt = conn.prepareStatement(SQL);
+			
+			// set the required parameter value
+			pStmt.setString(1, studId);
+			
+			pStmt.executeUpdate();
+			//ResultSet rs = pStmt.executeQuery(SQL);
+			
+		}catch(SQLException se){
+		//Handle errors for JDBC
+		//se.printStackTrace();
+		System.err.println(se.getMessage());
+			
+		}catch(Exception e){
+		 //Handle errors for Class.forName
+		 //e.printStackTrace();
+		System.err.println(e.getMessage());
+		}
+		
 		return false;
 	}
 
 	@Override
-	public ResultSet readRecord() {
+	public ResultSet readRecord(String studIdOrLastName) {
 		/*Statement stmt 	= null;
 		String SQL 		= "SELECT * FROM " + databaseTableName;*/
+		
+		//student search via studentID or studentLastName
+		
+		try {
+			
+			PreparedStatement pStmt = null;
+			
+			String SQL =	  "SELECT FROM " + databaseTableName 
+							+ "WHERE studId = ?";
+			
+			pStmt = conn.prepareStatement(SQL);
+			
+			pStmt.setString(1, studIdOrLastName);
+			
+			pStmt.executeUpdate();
+			
+			System.out.println("\nPlease wait . . . searching for student record " + studIdOrLastName);
+			
+			//If resultset = null, print("Record not found") ??
+			
+		}catch(SQLException se){
+			//Handle errors for JDBC
+			//se.printStackTrace();
+			System.err.println(se.getMessage());
+				
+		}catch(Exception e){
+			 //Handle errors for Class.forName
+			 //e.printStackTrace();
+			System.err.println(e.getMessage());
+		}
+		
 		return null;
 	}
 	
