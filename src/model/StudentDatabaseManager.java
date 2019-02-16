@@ -245,7 +245,8 @@ public class StudentDatabaseManager extends Database {
 		
 		try {
 			PreparedStatement pStmt = null;
-			
+			// TODO 
+			// StudentNotFoundException should not trigger when other exceptions occur
 			String SQL =	  "DELETE FROM " + databaseTableName 
 							+ "WHERE studId = ?";
 			
