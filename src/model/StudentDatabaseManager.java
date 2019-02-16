@@ -44,17 +44,17 @@ public class StudentDatabaseManager extends Database {
 		
 		// 4) if connection is valid, create a new student table
 		if(hasValidConnection()) {
-			createStudentTable();			
+			createStudentTable();
 		}
 	}
 	
 	
 	// GET DATABASE CONNECTION
 	private Connection getConnection() {
+
 		Connection databaseConnection = null;
 		
 		try {
-			
 			// register jdbc driver
 			Class.forName(JDBC_DRIVER);
 				
@@ -64,8 +64,6 @@ public class StudentDatabaseManager extends Database {
 			
 			System.out.println("DATABASE CONNECTION STATUS: Valid");
 			hr(1);
-			
-			return databaseConnection;
 			
 		} catch (ClassNotFoundException cnfe) {
 			System.out.println("# CONNECTION ERROR: DRIVER\n");
@@ -101,7 +99,7 @@ public class StudentDatabaseManager extends Database {
 		Statement 	stmt = null;
 		String 		SQL  = null;
 		
-		try {
+		try {			
 			// 1) delete existing tables
 			deleteDuplicateTable();
 			
@@ -242,10 +240,14 @@ public class StudentDatabaseManager extends Database {
 
 	@Override
 	public boolean deleteRecord(String studId) {
+		// TODO: deleteRecord()
 		// delete via studentId
+		
 		try {
-			PreparedStatement pStmt = null;			
-			String SQL = "DELETE FROM " + databaseTableName	+ "WHERE studId = ?";
+			PreparedStatement pStmt = null;
+			
+			String SQL =	  "DELETE FROM " + databaseTableName 
+							+ "WHERE studId = ?";
 			
 			pStmt = conn.prepareStatement(SQL);
 			
@@ -253,6 +255,7 @@ public class StudentDatabaseManager extends Database {
 			pStmt.setString(1, studId);
 			
 			pStmt.executeUpdate();
+			//ResultSet rs = pStmt.executeQuery(SQL);
 			
 		}catch(SQLException se){
 		//Handle errors for JDBC
@@ -499,8 +502,8 @@ public class StudentDatabaseManager extends Database {
 			if(conn.isValid(5)) {
 				return true;
 			}
-		} catch (Exception e) {
-			// skip
+		}catch (Exception e) {
+			System.out.println("ERROR: Unable to connect to the database. Please check your database configurations.");
 		}
 		
 		return false;
