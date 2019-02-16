@@ -468,10 +468,10 @@ public class StudentDatabaseManager extends Database {
             }
 			
 		} catch(SQLException sqle) {
-			System.out.println("listAllStudents Exception");
+			System.out.println("listAllStudents Exception:");
 			System.out.println("SQL ERROR: " + sqle.getMessage());
 		} catch(Exception e) {
-			System.out.println("ListAllStudents Exception");
+			System.out.println("ListAllStudents Exception:");
 			System.out.println("ERROR: " + e.getMessage());
 		}
 	}
@@ -505,11 +505,13 @@ public class StudentDatabaseManager extends Database {
 		try {
 			// 1) validate connection
 			if(!conn.isClosed() && conn.isValid(5)) {
-				// 2) close database connection
 				System.out.println("# Closing database connection...");
+				
+				// 2) close database connection
 				conn.close();
+				
 				System.out.println("# DB Closed");
-				View.quitCommandMessage();
+				
 				return true;
 			}
 		} catch (SQLException sqle) {
@@ -525,12 +527,12 @@ public class StudentDatabaseManager extends Database {
 		try {
 			if(conn.isValid(5)) {
 				return true;
+			} else {
+				return false;
 			}
 		}catch (Exception e) {
-			System.out.println("ERROR: Unable to connect to the database. Please check your database configurations.");
+			return false;
 		}
-		
-		return false;
 	}
 	
 	

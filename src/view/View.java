@@ -71,12 +71,17 @@ public class View {
 		System.out.println();
 	}
 	
-
-	public void printDefaultAppConfig(String tableName, String inputFile, String logFile) {
-		System.out.println("# DEFAULT APP CONFIGURATION");
-		System.out.println("(Default) STUDENT DATABASE TABLE NAME: " + tableName);
-		System.out.println("(Default) INPUT FILE PATH: \"" + inputFile + "\"");
-		System.out.println("(Default) LOG FILE PATH: \"" + logFile + "\"");
+	public static void printAppConfig(String tableName, String inputFile, String logFile, Boolean defaultConfig) {
+		System.out.println("# APP CONFIGURATION");
+		if(defaultConfig) {
+			System.out.println("(Default) STUDENT DATABASE TABLE NAME: " + tableName);
+			System.out.println("(Default) INPUT FILE PATH: \"" + inputFile + "\"");
+			System.out.println("(Default) LOG FILE PATH: \"" + logFile + "\"");			
+		} else {
+			System.out.println("STUDENT DATABASE TABLE NAME: " + tableName);
+			System.out.println("INPUT FILE PATH: \"" + inputFile + "\"");
+			System.out.println("LOG FILE PATH: \"" + logFile + "\"");
+		}
 	}
 	
 	
