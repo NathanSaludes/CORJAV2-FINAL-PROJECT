@@ -78,13 +78,16 @@ public class View {
 		
 	}
 	
-	public void commandQ() {
+	public static void quitCommandExecuted() {
 		// terminates the application
 		System.out.println("\nProgram terminated. Thank you for using the system.");
+		hr(2);
 	}
 	
 	public void printUserEntry(String input) {
-		System.out.println("USER ENTRY: " + input + "\n");
+		System.out.println("COMMAND: " + input);
+		// System.out.println("# Reading command " + input + "...");
+		System.out.println();
 	}
 	
 	
@@ -128,7 +131,11 @@ public class View {
 			break;
 		case 2:
 			System.out.println("==================================================================="
-					+ "======================================================================================================");
+					+ "==========================================================================================================================");
+			break;
+		case 3:
+			System.out.println("___________________________________________________________________"
+					+ "__________________________________________________________________________________________________________________________");
 			break;
 		default:
 			System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"

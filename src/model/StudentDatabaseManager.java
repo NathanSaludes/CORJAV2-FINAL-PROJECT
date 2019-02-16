@@ -37,21 +37,13 @@ public class StudentDatabaseManager extends Database {
 		hr(1);
 		
 		// 3) Establish a connection upon instantiation
-		try {
-			conn = getConnection();
-			
-			if(conn.isValid(5)) {
-				createStudentTable();
-			}
-			
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-			System.out.println(e.getCause());
-			// e.printStackTrace();
-		} catch (Exception e) {
-			// e.printStackTrace();
-		}
+		conn = getConnection();
 		
+		
+		// 4) if connection is valid, create a new student table
+		if(hasValidConnection()) {
+			createStudentTable();
+		}
 	}
 	
 	
@@ -61,10 +53,10 @@ public class StudentDatabaseManager extends Database {
 		Connection databaseConnection = null;
 		
 		try {
-			// REGISTER JDBC DRIVER
+			// register jdbc driver
 			Class.forName(JDBC_DRIVER);
 				
-			// OPEN A CONNECTION
+			// open a connection
 			System.out.println("# Connecting to database...");
 			databaseConnection = DriverManager.getConnection(DB_URL, "root", "");
 			
@@ -106,16 +98,16 @@ public class StudentDatabaseManager extends Database {
 		String 		SQL  = null;
 		
 		try {			
-			// DELETE EXISTING TABLES FIRST
+			// 1) delete existing tables
 			deleteDuplicateTable();
 			
 			// SAMPLE OUTPUT: "Creating <DB_NAME> table"
 			System.out.println("# Creating new table, \'" + databaseTableName.toLowerCase() + "\' ...");
 			
-			
+			// 2) initialize statement object
 			stmt = conn.createStatement();
 			
-			// SQL TO CREATE STUDENT TABLE
+			// 3) initialize create table SQL
 			SQL  =	"CREATE TABLE " + databaseTableName + " ("  +
 					" id INTEGER NOT NULL AUTO_INCREMENT, " 	+
 					" studId VARCHAR(15), " 		+
@@ -127,10 +119,14 @@ public class StudentDatabaseManager extends Database {
 					" PRIMARY KEY ( id )" 		+
 					")";
 			
+			// 4) execute create table
 			stmt.executeUpdate(SQL);
 			
 			System.out.println("# Successfully created \'" + databaseTableName.toLowerCase() + "\' table!");
 			hr(1);
+			
+			// 5) close resources
+			stmt.close();
 			
 		} catch (SQLException sqle) {
 			System.out.println("# Failed to create a student record...");
@@ -152,23 +148,34 @@ public class StudentDatabaseManager extends Database {
 		String SQL 		= "DROP TABLE ";
 		
 		try {
+			// 1) get database meta data
 			DatabaseMetaData dmbd = conn.getMetaData();
-			ResultSet res = dmbd.getTables(null, null, "%", null); // RETURNS ALL TABLES
+			
+			// 2) get all tables from the database
+			ResultSet res = dmbd.getTables(null, null, "%", null);
+			
+			// 3) initialize statement
 			stmt = conn.createStatement();
 			
-			// SCANS THE RETURNED RESULTS FROM DATABASE
+			// 4) scan results
 			while(res.next()) {
 				if(databaseTableName.equalsIgnoreCase(res.getString("TABLE_NAME"))) {
 					System.out.println("# Found an existing \'" + databaseTableName.toLowerCase() + "\' table!");
+					
+					// 5) update SQL
 					SQL = SQL.concat(res.getString("TABLE_NAME"));
 					
-					// EXECUTE DROP TABLE QUERY
+					// 6) Execute SQL update
 					stmt.executeUpdate(SQL);
 					
 					System.out.println("# Dropped \'" + res.getString("TABLE_NAME").toLowerCase() + "\' table...");
 					System.out.println("#");
 				}
 			}
+			
+			// close resources
+			res.close();
+			stmt.close();
 			
 		} catch (SQLException sqle) {
 			// TODO: deleteDuplicateTable() - handle SQL exception
@@ -191,14 +198,19 @@ public class StudentDatabaseManager extends Database {
 	public boolean insertRecord(Student student) {
 		PreparedStatement pStmt = null;
 		
+		// 1) initialize prepared statement SQL
 		String SQL =	  "INSERT INTO " + databaseTableName + " (" 
 						+ "studId, firstName, lastName, course, yearLevel, unitsEnrolled) "
 						+ "values (?,?,?,?,?,?)";
 		
         try {
-            if (conn.isValid(5) && !conn.isClosed()) {
+        	// 2) validate connection
+            if (hasValidConnection()) {
+            	
+            	// 3) initialize prepared statement object
                 pStmt = conn.prepareStatement(SQL);
                 
+                // set required parameter values from the prepared statement
                 pStmt.setString	(1, student.getStudentId()		);
                 pStmt.setString	(2, student.getFirstName()		);
                 pStmt.setString	(3, student.getLastName()		);
@@ -206,12 +218,14 @@ public class StudentDatabaseManager extends Database {
                 pStmt.setInt	(5, student.getYearLevel()		);
                 pStmt.setInt	(6, student.getUnitsEnrolled()	);
                 
+                // 4) execute update
                 if(pStmt.executeUpdate() == 1) {
-                	System.out.println("# Successfully inserted a new student record into the database!");                	
+                	System.out.println("# Successfully inserted a new student record into the database!");
+                	return true;
                 }
                 
-                
-                return true;
+                // 5) close resources
+                pStmt.close();
             }
             
         } catch (SQLException sqle) {
@@ -294,12 +308,13 @@ public class StudentDatabaseManager extends Database {
 	}
 	
 	public void listAll() {
+		
 		PreparedStatement pStmt = null;
 		ResultSet res 			= null;
 		String SQL				= null;
 		
 		try {
-			if (conn.isValid(5) && !conn.isClosed()) {
+			if (hasValidConnection()) {
 				
 				// print all students
 				SQL = "SELECT * FROM " + databaseTableName;				
@@ -318,28 +333,49 @@ public class StudentDatabaseManager extends Database {
                 hr(1);
                 
                 // count the number of total students
-                SQL = "SELECT COUNT(*) as totalStudents FROM " + databaseTableName;
+                SQL = "SELECT COUNT(*) AS totalStudents FROM " + databaseTableName;
                 pStmt = conn.prepareStatement(SQL);
                 res = pStmt.executeQuery();
                 
                 if(res.next()) {
                 	System.out.println("Total Students Enrolled: " + res.getInt("totalStudents"));
+                	System.out.println();
                 }
                 
-                // count total number of cs students
-                SQL = "SELECT COUNT(*) as CS_STUDENTS FROM " + databaseTableName + " WHERE course='BS CS'";
-                pStmt = conn.prepareStatement(SQL);
-                res = pStmt.executeQuery();
                 
-                if(res.next()) {
-                	System.out.println("Total Students in CS: " + res.getInt("CS_STUDENTS"));
+                // count the number of students in each course
+                SQL = "SELECT COUNT(*) AS courseCount FROM " + databaseTableName + " WHERE course=?";
+                String stmtParam = null;
+                
+                for(int counter=1; counter <= 3; counter++) {
+                	switch(counter) {
+                	case 1:
+                		stmtParam = "BS CS";
+                		break;
+                	case 2:
+                		stmtParam = "BS IT";
+                		break;
+                	case 3:
+                		stmtParam = "BS IS";
+                		break;
+            		default: //skip
+            			break;
+                	}
+                	                	
+                	pStmt = conn.prepareStatement(SQL);
+                	pStmt.setString(1, stmtParam);
+                	res = pStmt.executeQuery();
+                	
+                	if(res.next()) {
+                		System.out.println("Total Students in " + stmtParam + ": " + res.getInt("courseCount"));
+                	}
                 }
                 
-                // count total number of IT students
-                
-                // count total number of IS students
-                
-                
+                hr(1);
+               
+                // close resources
+               pStmt.close();
+               res.close();
             }
 			
 		} catch(SQLException sqle) {
@@ -351,14 +387,36 @@ public class StudentDatabaseManager extends Database {
 		}
 	}
 	
+	public void clearTable() {
+		
+		Statement stmt  = null;
+		String SQL = "DELETE FROM " + databaseTableName;
+		
+		try {
+			stmt = conn.createStatement();
+			
+			System.out.println("# Deleting all records...Please wait.");
+			stmt.executeUpdate(SQL);
+			System.out.println("# Successfully deleted ALL records");
+			
+			hr(1);
+		} catch(SQLException sqle) {
+			System.out.println("SQL ERROR: " + sqle.getMessage());
+			// sqle.printStackTrace();
+		}
+		
+		
+	}
 	// ==========================================================================================================================================================
 	
 
 	// CLOSE ALL OPENED RESOURCES
 	@Override
-	public boolean closeResources() {
+	public boolean terminateConnection() {
 		try {
-			if(!conn.isClosed() && conn.isValid(0)) {
+			// 1) validate connection
+			if(!conn.isClosed() && conn.isValid(5)) {
+				// 2) close database connection
 				conn.close();				
 				System.out.println("# Closing db connection...");
 				return true;
@@ -400,6 +458,10 @@ public class StudentDatabaseManager extends Database {
 		case 2:
 			System.out.println("==================================================================="
 					+ "======================================================================================================");
+			break;
+		case 3:
+			System.out.println("___________________________________________________________________"
+					+ "__________________________________________________________________________________________________________________________");
 			break;
 		default:
 			System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"

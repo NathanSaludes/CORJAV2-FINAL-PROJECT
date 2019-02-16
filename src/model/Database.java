@@ -4,11 +4,6 @@ import java.sql.*;
 
 public abstract class Database {
 	
-	// DB CONFIGURATION
-	private static String JDBC_DRIVER 	= null;
-	private static String DB_NAME 		= null;
-	private static String DB_URL 		= null;
-	
 	// FOR INSERTING RECORDS TO THE DATABASE
 	public abstract boolean insertRecord(Student student);
 	
@@ -19,5 +14,5 @@ public abstract class Database {
 	public abstract ResultSet readRecord(String studIdOrLastName);
 	
 	// FOR CLOSING ALL OPENED RESOURCES
-	public abstract boolean closeResources();
+	public abstract boolean terminateConnection();
 }
