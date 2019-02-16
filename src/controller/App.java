@@ -27,11 +27,10 @@ public class App {
 		}
 		
 		// create a database
-		StudentDatabaseManager DatabaseManager = createDatabaseConnection();
+		StudentDatabaseManager databaseManager = createDatabaseConnection();
 		
-		if(DatabaseManager.hasValidConnection()) {
-			readCommandFile(DatabaseManager);			
-		}
+		readCommandFile(databaseManager);
+		
 	}
 
 
@@ -45,11 +44,15 @@ public class App {
 				tableName
 		);
 		
-		return database;
+		return database;	
 	}
 
 	// READ INPUT COMMAND FILE
-	public static void readCommandFile(StudentDatabaseManager DatabaseManager) {
-		new InputCommandFileReader(inputFilePath, DatabaseManager);
+	public static void readCommandFile(StudentDatabaseManager databaseManager) {
+		if(databaseManager.hasValidConnection()) {
+			new InputCommandFileReader(inputFilePath, databaseManager);			
+		} else {
+			System.out.println("# Unable to read command file.");			
+		}
 	}
 }
