@@ -292,6 +292,8 @@ public class StudentDatabaseManager extends Database {
 			
 			//If resultset = null, print("Record not found") ??
 			
+			//ResultSet rs = 
+			
 		}catch(SQLException se){
 			//Handle errors for JDBC
 			//se.printStackTrace();
