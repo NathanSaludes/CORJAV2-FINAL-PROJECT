@@ -444,10 +444,10 @@ public class StudentDatabaseManager extends Database {
             }
 			
 		} catch(SQLException sqle) {
-			System.out.println("listAllStudents Exception");
+			System.out.println("listAllStudents Exception:");
 			System.out.println("SQL ERROR: " + sqle.getMessage());
 		} catch(Exception e) {
-			System.out.println("ListAllStudents Exception");
+			System.out.println("ListAllStudents Exception:");
 			System.out.println("ERROR: " + e.getMessage());
 		}
 	}
@@ -503,12 +503,12 @@ public class StudentDatabaseManager extends Database {
 		try {
 			if(conn.isValid(5)) {
 				return true;
+			} else {
+				return false;
 			}
 		}catch (Exception e) {
-			// skip
+			return false;
 		}
-		
-		return false;
 	}
 	
 	

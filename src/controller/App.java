@@ -20,14 +20,18 @@ public class App {
 		if(args.length == 3) {
 			tableName 		= args[0];
 			inputFilePath 	= args[1];
-			logFilePath 	= args[2];	
+			logFilePath 	= args[2];
+			
+			View.printAppConfig(tableName, inputFilePath, logFilePath, false);
+			
 		} else {
 			// If main arguments are not provided, the application will use the default configuration
-			new View().printDefaultAppConfig(tableName, inputFilePath, logFilePath);
+			View.printAppConfig(tableName, inputFilePath, logFilePath, true);
 		}
 		
 		// create a database manager
 		StudentDatabaseManager databaseManager = handleDatabaseManager();
+		
 		handleInputCommandFileReader(databaseManager);			
 		
 	}

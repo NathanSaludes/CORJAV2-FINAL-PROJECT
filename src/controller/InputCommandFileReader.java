@@ -58,7 +58,7 @@ public class InputCommandFileReader {
 		Scanner scanner = null;
 		
 		try {
-			// open file and set the delimitter to 
+			// open file and set the delimitter to next line character ('\n')
 			// TODO: Resource Leak: closeable value for Scanner
 			scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
 			
@@ -136,22 +136,22 @@ public class InputCommandFileReader {
 		// get all required inputs for each parameter
 		for(parameterIndex = 1; parameterIndex <= 6 && scanner.hasNext(); parameterIndex++) {
 			switch (parameterIndex) {
-			case 1: 
+			case 1: // id
 				studentId = scanner.next().trim();
 				break;
-			case 2:
+			case 2: // last name
 				lastName = scanner.next().trim();
 				break;
-			case 3:
+			case 3: // first name
 				firstName = scanner.next().trim();
 				break;
-			case 4:
+			case 4: // course
 				course = scanner.next().trim();
 				break;
-			case 5:
+			case 5: // year level
 				yearLevel = Integer.parseInt(scanner.next().trim());
 				break;
-			case 6:
+			case 6: // units enrolled
 				unitsEnrolled = Integer.parseInt(scanner.next().trim());
 				break;
 				
@@ -170,8 +170,7 @@ public class InputCommandFileReader {
 				unitsEnrolled
 		);
 		
-		// TODO
-		// check if the studentID is unique based on the records in the database table
+		// TODO: check if the studentID is unique based on the records in the database table
 		// if not then its either throw a custom exception for duplicate student entry
 		// or overwrite the existing student record with the latest student record entry
 		
@@ -196,8 +195,8 @@ public class InputCommandFileReader {
 	}
 
 	private void commandP() {
+		// purge table records
 		DatabaseManager.clearTable();
-		View.deleteRecordsMessage();
 	}
 
 	private void commandR(Scanner scanner) {
