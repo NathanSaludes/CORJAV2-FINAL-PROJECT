@@ -481,11 +481,13 @@ public class StudentDatabaseManager extends Database {
 		try {
 			// 1) validate connection
 			if(!conn.isClosed() && conn.isValid(5)) {
-				// 2) close database connection
 				System.out.println("# Closing database connection...");
+				
+				// 2) close database connection
 				conn.close();
+				
 				System.out.println("# DB Closed");
-				View.quitCommandMessage();
+				
 				return true;
 			}
 		} catch (SQLException sqle) {
