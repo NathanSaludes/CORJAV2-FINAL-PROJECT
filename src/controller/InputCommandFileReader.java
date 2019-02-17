@@ -198,7 +198,6 @@ public class InputCommandFileReader {
 	private void commandP() {
 		// purge table records
 		DatabaseManager.clearTable();
-		System.out.println("\nDatabase table cleared");
 	}
 
 	private void commandR(Scanner scanner) {
@@ -231,10 +230,7 @@ public class InputCommandFileReader {
 				//skips
 				System.out.println("Error, criteria choice wrong");
 				break;
-		}
-		
-		View.hr(1);
-		
+		}	
 		
 	}
 
