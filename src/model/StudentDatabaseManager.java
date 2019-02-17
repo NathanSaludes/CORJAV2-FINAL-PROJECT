@@ -332,68 +332,211 @@ public class StudentDatabaseManager extends Database {
 		return null;
 	}
 	
-	public void listAllByCourse(String course) {
-		// for command R, search by course 
-		
+	public void generateReports(String course) {
+
 		PreparedStatement pStmt = null;
 		ResultSet res 			= null;
 		String SQL				= null;
-		
-		try {
-			if (hasValidConnection()) {
-				
-               //----- course counter -----//
 
-                System.out.println("\nCreating a report for all " + course + " students:");
-                
-             // count the number of total students
-                SQL = "SELECT COUNT(*) AS courseCounter FROM " + databaseTableName + " WHERE course =?";
-                pStmt = conn.prepareStatement(SQL);
-                pStmt.setString(1, course);
-                res = pStmt.executeQuery();
-                
-                System.out.println("\nTotal number of " + course + " students: " + res.getInt("courseCounter"));
-                
-                System.out.println("\n\nList of students enrolled in " + course);
-                hr(2);
-				
-				// print all students
-				SQL = "SELECT * FROM " + databaseTableName + " WHERE course =?";				
-                pStmt = conn.prepareStatement(SQL);
-                pStmt.setString(1, course);
-                res = pStmt.executeQuery();
-                
- 
-                
-                for(int counter=1; res.next(); counter++) {
-                	System.out.println("\n[" + counter + "]");
-                	System.out.println("ID: " + res.getString("studId"));
-                	System.out.println("Name: " + res.getString("lastName")+", "+res.getString("firstName"));
-                	System.out.println("Course: " + res.getString("course"));
-                	System.out.println("Year Level: " + res.getString("yearLevel"));
-                	System.out.println("Units Enrolled: " + res.getString("unitsEnrolled"));
-                }
-                
-                hr(1);
-                
-               
-                // close resources
-               pStmt.close();
-               res.close();
-            }
+		// check if valid connection
+		if(hasValidConnection()) {
+			try {
+				switch (course) {
+					case "ALL":						
+						// count the number of students in each course
+						SQL = "SELECT COUNT(*) AS courseCount FROM " + databaseTableName + " WHERE course=?";
+	
+						String stmtParam = null;
+	
+						for(int counter=1; counter <= 3; counter++) {
+							switch(counter) {
+							case 1:
+								stmtParam = "SE";
+								break;
+							case 2:
+								stmtParam = "GD";
+								break;
+							case 3:
+								stmtParam = "WD";
+								break;
+							default: //skip
+								break;
+							}
+	
+							pStmt = conn.prepareStatement(SQL);
+							pStmt.setString(1, stmtParam);
+							res = pStmt.executeQuery();
+	
+							if(res.next()) {
+								System.out.println("# Total Students in " + stmtParam + ": " + res.getInt("courseCount"));
+							}
+						}
+	
+						System.out.print("\n");
+	
+						// list each students by course category
+						listStudentsByCourse(SQL, res, pStmt);
+	
+						hr(1);
+						pStmt.close();
+						res.close();
+					break;
+	
+	
+	
+					case "SE":
+						SQL = "SELECT COUNT(*) AS SE_STUDENTS FROM " + databaseTableName + " WHERE course=?";						
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "SE");
+						res = pStmt.executeQuery();
+	
+						if(res.next()) {
+							System.out.println("# Total Students in SE: " + res.getInt("SE_STUDENTS"));
+						}
+	
+						SQL = "SELECT * FROM " + databaseTableName + " WHERE course=?";
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "SE");
+						res = pStmt.executeQuery();
+	
+						for(int counter=1; res.next(); ++counter) {
+							System.out.println("\n[" + counter + "]");
+							new View().printAStudentRecord(res);
+						}
+	
+						hr(1);
+						
+						pStmt.close();
+						res.close();
+					break;
+	
+	
+	
+					case "GD":
+						SQL = "SELECT COUNT(*) AS GD_STUDENTS FROM " + databaseTableName + " WHERE course=?";
+	
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "GD");
+						res = pStmt.executeQuery();
+	
+						if(res.next()) {
+							System.out.println("# Total Students in GD: " + res.getInt("SE_STUDENTS"));
+						}
+	
+						SQL = "SELECT * FROM " + databaseTableName + " WHERE course=?";
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "GD");
+						res = pStmt.executeQuery();
+	
+						for(int counter=1; res.next(); ++counter) {
+							System.out.println("[" + counter + "]");
+							new View().printAStudentRecord(res);
+						}
+	
+						hr(1);
+						pStmt.close();
+						res.close();
+					break;
+	
+	
+	
+					case "WD":
+						SQL = "SELECT COUNT(*) AS WD_STUDENTS FROM " + databaseTableName + " WHERE course=?";
+	
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "WD");
+						res = pStmt.executeQuery();
+	
+						if(res.next()) {
+							System.out.println("# Total Students in WD: " + res.getInt("SE_STUDENTS"));
+						}
+	
+						SQL = "SELECT * FROM " + databaseTableName + " WHERE course=?";
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "WD");
+						res = pStmt.executeQuery();
+	
+						for(int counter=1; res.next(); ++counter) {
+							System.out.println("[" + counter + "]");
+							new View().printAStudentRecord(res);
+						}
+	
+						hr(1);
+						pStmt.close();
+						res.close();
+					break;
+	
+					default: 
+						System.out.println("# Invalid Entry.");
+						//skip
+					break;
+
+				} // switch
 			
-		} catch(SQLException sqle) {
-			System.out.println("listAllStudentsByCourse Exception");
-			System.out.println("SQL ERROR: " + sqle.getMessage());
-		} catch(Exception e) {
-			System.out.println("ListAllStudentsByCourse Exception");
-			System.out.println("ERROR: " + e.getMessage());
-		}
+			} catch (SQLException sqle) {
+				System.out.println("SQL ERROR: " + sqle.getMessage());
+				System.out.println("# Failed to generate reports.");
+			} catch (Exception e) {
+				System.out.println("ERROR: " + e.getMessage());
+				System.out.println("# Failed to generate reports.");
+			}
+			
+			
+		} // if statement
+	} // Generate Report Method
+
+	public void listStudentsByCourse(String SQL, ResultSet res, PreparedStatement pStmt) throws SQLException {
 		
-		
+        SQL = "SELECT * FROM " + databaseTableName + " WHERE course=? ORDER BY lastName";
+        pStmt = conn.prepareStatement(SQL);
+        
+        for(int counter=1; counter <= 3; counter++) {
+        	switch(counter) {
+	        	case 1:
+	        		pStmt.setString(1, "SE");
+	        		res = pStmt.executeQuery();
+	        		System.out.println("--- SOFTWARE ENGINEERING(SE) ---");
+	        		
+        			for(int iterator=1; res.next(); iterator++) {
+        				System.out.println("\n[" + iterator + "]");
+        				new View().printAStudentRecord(res);
+        			}
+	        		
+	        		System.out.print("\n");
+	        		break;
+	        	case 2:
+	        		pStmt.setString(1, "GD");
+	        		res = pStmt.executeQuery();
+	        		System.out.println("--- GAME DEVELOPMENT(GD) ---");
+	        		
+	        		for(int iterator=1; res.next(); iterator++) {
+	            		System.out.println("\n[" + iterator + "]");
+	            		new View().printAStudentRecord(res);
+	            	}
+	        		
+	        		System.out.print("\n");
+	        		break;
+	        	case 3:
+	        		pStmt.setString(1, "WD");
+	        		res = pStmt.executeQuery();
+	        		System.out.println("--- WEB DEVELOPMENT(WD) ---");
+	        		
+	        		for(int iterator=1; res.next(); iterator++) {
+	            		System.out.println("\n[" + iterator + "]");
+	            		new View().printAStudentRecord(res);
+	            	}
+	        		
+	        		System.out.print("\n");
+	        		break;
+	        		
+	        	default: break;
+        	}
+        	
+        	
+        }
 	}
 	
-	public void listAll() {
+	public void listAllStudents() {
 		
 		PreparedStatement pStmt = null;
 		ResultSet res 			= null;
@@ -403,7 +546,6 @@ public class StudentDatabaseManager extends Database {
 			if (hasValidConnection()) {
 				
 				System.out.println("\nList of Students enrolled: ");
-				System.out.println("\n==============");
 				
 				// print all students
 				SQL = "SELECT * FROM " + databaseTableName;				
@@ -412,11 +554,7 @@ public class StudentDatabaseManager extends Database {
                 
                 for(int counter=1; res.next(); counter++) {
                 	System.out.println("\n[" + counter + "]");
-                	System.out.println("ID: " + res.getString("studId"));
-                	System.out.println("Name: " + res.getString("lastName")+", "+res.getString("firstName"));
-                	System.out.println("Course: " + res.getString("course"));
-                	System.out.println("Year Level: " + res.getString("yearLevel"));
-                	System.out.println("Units Enrolled: " + res.getString("unitsEnrolled"));
+                	new View().printAStudentRecord(res);
                 }
                 
                 hr(1);
@@ -431,40 +569,40 @@ public class StudentDatabaseManager extends Database {
                 	System.out.println();
                 }
                 
-                
                 // count the number of students in each course
                 SQL = "SELECT COUNT(*) AS courseCount FROM " + databaseTableName + " WHERE course=?";
-                String stmtParam = null;
-                
-                for(int counter=1; counter <= 3; counter++) {
-                	switch(counter) {
-                	case 1:
-                		stmtParam = "CS";
-                		break;
-                	case 2:
-                		stmtParam = "GD";
-                		break;
-                	case 3:
-                		stmtParam = "WD";
-                		break;
-            		default: //skip
-            			break;
-                	}
-                	                	
-                	pStmt = conn.prepareStatement(SQL);
-                	pStmt.setString(1, stmtParam);
-                	res = pStmt.executeQuery();
-                	
-                	if(res.next()) {
-                		System.out.println("Total Students in " + stmtParam + ": " + res.getInt("courseCount"));
-                	}
-                }
+            	
+				String stmtParam = null;
+
+				for(int counter=1; counter <= 3; counter++) {
+					switch(counter) {
+					case 1:
+						stmtParam = "SE";
+						break;
+					case 2:
+						stmtParam = "GD";
+						break;
+					case 3:
+						stmtParam = "WD";
+						break;
+					default: //skip
+						break;
+					}
+
+					pStmt = conn.prepareStatement(SQL);
+					pStmt.setString(1, stmtParam);
+					res = pStmt.executeQuery();
+
+					if(res.next()) {
+						System.out.println("# Total Students in " + stmtParam + ": " + res.getInt("courseCount"));
+					}
+				}
                 
                 hr(1);
                
                 // close resources
-               pStmt.close();
-               res.close();
+                pStmt.close();
+                res.close();
             }
 			
 		} catch(SQLException sqle) {

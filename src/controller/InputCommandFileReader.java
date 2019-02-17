@@ -201,37 +201,13 @@ public class InputCommandFileReader {
 	}
 
 	private void commandR(Scanner scanner) {
-		// TODO Generate a report based on given criteria
-		// Criteria "ALL" or by specific course SE/GD/WD
-		String criteriaChoice = null;
+		String studentCourse = null;
 		
-		criteriaChoice = scanner.next().trim();
-		
-		switch (criteriaChoice) 
-		{
-			case "ALL":
-				//prints all??
-				DatabaseManager.listAll();
-				break;
-			
-			case "SE":
-				DatabaseManager.listAllByCourse("SE");
-				break;
-				
-			case "GD":
-				DatabaseManager.listAllByCourse("SE");
-				break;
-			
-			case "WD":
-				DatabaseManager.listAllByCourse("SE");
-				break;
-			
-			default: 
-				//skips
-				System.out.println("Error, criteria choice wrong");
-				break;
-		}	
-		
+		if(scanner.hasNext()) {
+			studentCourse = scanner.next().toString().toUpperCase().trim(); // convert to String -> convert all to upper case -> trim trailing white space/s.
+			System.out.println("# " + studentCourse);
+			DatabaseManager.generateReports(studentCourse);
+		}		
 	}
 
 	private void commandD(Scanner scanner)throws StudentNotFoundException {
@@ -264,7 +240,7 @@ public class InputCommandFileReader {
 	}
 
 	private void commandL() {
-		DatabaseManager.listAll();
+		DatabaseManager.listAllStudents();
 	}
 
 	

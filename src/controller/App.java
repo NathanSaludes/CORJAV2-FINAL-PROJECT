@@ -9,7 +9,7 @@ public class App {
 	// DEFAULT APP CONFIG
 	public static String tableName 		= "students";
 	public static String inputFilePath 	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testInputFile.txt";
-	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testInputFile.txt";
+	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testLogFile.txt";
 	
 	private static String JDBC_DRIVER	= "com.mysql.jdbc.Driver";
 	private static String DB_NAME		= "iacademy";

@@ -1,5 +1,7 @@
 package view;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 import model.Student;
@@ -84,6 +86,14 @@ public class View {
 		}
 	}
 	
+	
+	public void printAStudentRecord(ResultSet res) throws SQLException {
+		System.out.println("ID: " + res.getString("studId"));
+    	System.out.println("Name: " + res.getString("lastName")+", "+res.getString("firstName"));
+    	System.out.println("Course: " + res.getString("course"));
+    	System.out.println("Year Level: " + res.getString("yearLevel"));
+    	System.out.println("Units Enrolled: " + res.getString("unitsEnrolled"));
+	}
 	
 	// DEBUGGING METHODS ===========================================================================================================================================
 	public void printFileContents(Scanner s, String fileName) {
