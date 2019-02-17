@@ -8,8 +8,8 @@ public class App {
 	
 	// DEFAULT APP CONFIG
 	public static String tableName 		= "students";
-	public static String inputFilePath 	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testInputFile.txt";
-	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testInputFile.txt";
+	public static String inputFilePath 	= "C:\\Users\\Guest Account\\Desktop\\Github Project Repository\\testInputFile.txt";
+	public static String logFilePath	= "C:\\Users\\Guest Account\\Desktop\\Github Project Repository\\testLogFile.txt";
 	
 	private static String JDBC_DRIVER	= "com.mysql.jdbc.Driver";
 	private static String DB_NAME		= "iacademy";
@@ -39,7 +39,7 @@ public class App {
 
 
 	// ===========================================================================================================================================================
-	// returns a student database manager object
+	// START STUDENT DATABASE OPERATIONS MANAGER
 	public static StudentDatabaseManager handleDatabaseManager() {
 		StudentDatabaseManager database = new StudentDatabaseManager(
 			JDBC_DRIVER,
@@ -51,11 +51,11 @@ public class App {
 		return database;
 	}
 
-	// handles 
+	// READ INPUT COMMAND FILE
 	@SuppressWarnings("static-access")
 	public static void handleInputCommandFileReader(StudentDatabaseManager DatabaseManager) throws StudentNotFoundException {
 		
-		//before reading input command file, check if the database connection is valid.
+		//before reading input command file, check if db connection is valid.
 		if(DatabaseManager.hasValidConnection()) {
 			new InputCommandFileReader(inputFilePath, DatabaseManager);			
 		} else {
