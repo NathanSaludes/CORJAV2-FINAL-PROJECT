@@ -1,33 +1,32 @@
 package controller;
 
-import exceptions.StudentNotFoundException;
 import model.StudentDatabaseManager;
 import view.View;
 
 public class App {
 	
 	// DEFAULT APP CONFIG
-	public static String tableName 		= "students";
-	public static String inputFilePath 	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testInputFile.txt";
-	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testInputFile.txt";
+	public static String inputFilePath 	= "C:\\Users\\Nathaniel Saludes\\Desktop\\input.dat";
+	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testLogFile.txt";
 	
 	private static String JDBC_DRIVER	= "com.mysql.jdbc.Driver";
-	private static String DB_NAME		= "iacademy";
-	private static String DB_URL		= "jdbc:mysql://localhost:3306/" + DB_NAME;
+	private static String DB_NAME		= "College";
+	private static String DB_URL		= "jdbc:mysql://localhost:3306/";
+	public	static String DB_TABLENAME	= "students";
 	
-	public static void main(String[] args) throws StudentNotFoundException {
+	public static void main(String[] args) {
 		
 		// If main arguments are provided, it will override the application configurations
 		if(args.length == 3) {
-			tableName 		= args[0];
+			DB_TABLENAME 	= args[0];
 			inputFilePath 	= args[1];
 			logFilePath 	= args[2];
 			
-			View.printAppConfig(tableName, inputFilePath, logFilePath, false);
+			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, false);
 			
 		} else {
 			// If main arguments are not provided, the application will use the default configuration
-			View.printAppConfig(tableName, inputFilePath, logFilePath, true);
+			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, true);
 		}
 		
 		// create a database manager
@@ -45,7 +44,7 @@ public class App {
 			JDBC_DRIVER,
 			DB_NAME, 
 			DB_URL, 
-			tableName
+			DB_TABLENAME
 		);
 		
 		return database;
@@ -53,11 +52,11 @@ public class App {
 
 	// handles 
 	@SuppressWarnings("static-access")
-	public static void handleInputCommandFileReader(StudentDatabaseManager DatabaseManager) throws StudentNotFoundException {
+	public static void handleInputCommandFileReader(StudentDatabaseManager DatabaseManager) {
 		
 		//before reading input command file, check if the database connection is valid.
 		if(DatabaseManager.hasValidConnection()) {
-			new InputCommandFileReader(inputFilePath, DatabaseManager);			
+			new InputCommandFileReader(inputFilePath, DatabaseManager, DB_TABLENAME);			
 		} else {
 			System.out.println("# Unable to read command file. invalid database connection.");
 			new View().quitCommandMessage();

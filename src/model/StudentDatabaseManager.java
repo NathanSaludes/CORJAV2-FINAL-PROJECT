@@ -1,12 +1,14 @@
 package model;
 
 import java.sql.*;
+import java.util.Scanner;
 
+import exceptions.StudentNotFoundException;
 import view.View;
 
-public class StudentDatabaseManager extends Database {
+public class StudentDatabaseManager {
 	
-	private static 	String databaseTableName 	= null;	// USER PROVIDED DATABASE TABLE NAME
+	private static 	String databaseTableName 			= null;	// USER PROVIDED DATABASE TABLE NAME
 	private static	Connection conn 					= null; // DATABASE CONNECTION OBJECT
 	
 	
@@ -14,7 +16,6 @@ public class StudentDatabaseManager extends Database {
 	private String JDBC_DRIVER	= null;
 	private String DB_NAME		= null;
 	private String DB_URL		= null;
-	
 	
 	// CONSTRUCTOR
 	public StudentDatabaseManager(
@@ -38,13 +39,14 @@ public class StudentDatabaseManager extends Database {
 		
 		hr(1);
 		
-		// 3) Establish a connection upon instantiation
+		// 3) Establish a connection upon instantiation	
+		System.out.println("# Connecting to database...");
 		conn = getConnection();
 		
+		hr(1);
 		
-		// 4) if connection is valid, create a new student table
 		if(hasValidConnection()) {
-			createStudentTable();
+			createDatabase(DB_NAME);			
 		}
 	}
 	
@@ -59,11 +61,9 @@ public class StudentDatabaseManager extends Database {
 			Class.forName(JDBC_DRIVER);
 				
 			// open a connection
-			System.out.println("# Connecting to database...");
 			databaseConnection = DriverManager.getConnection(DB_URL, "root", "");
 			
 			System.out.println("DATABASE CONNECTION STATUS: Valid");
-			hr(1);
 			
 		} catch (ClassNotFoundException cnfe) {
 			System.out.println("# CONNECTION ERROR: DRIVER\n");
@@ -94,6 +94,72 @@ public class StudentDatabaseManager extends Database {
 		return databaseConnection;
 	}
 	
+	// CREATE DATABASE
+	private void createDatabase(String DB_NAME) {
+		Statement stmt = null;
+		String SQL				= null;
+		DatabaseMetaData dbmd	= null;
+		ResultSet res			= null;
+		
+		// CHECK IF THERE IS EXISTING DATABASE NAME
+		try {			
+			dbmd = conn.getMetaData();
+			
+			res = dbmd.getCatalogs();
+			
+			// check if there is existing database else, create a new database
+			if(databaseExists(res)) {
+				this.DB_URL = DB_URL + DB_NAME;
+				
+				// reinitialize connection
+				System.out.println("# Reinitializing database URL...");
+				conn = getConnection();
+				
+				hr(1);
+				
+				// create a new student table
+				createStudentTable();
+			} else {
+				SQL = "CREATE DATABASE " + DB_NAME;
+				
+				stmt = conn.createStatement();
+				
+				stmt.executeUpdate(SQL);
+				
+				// update database URL
+				this.DB_URL = DB_URL + DB_NAME;
+				
+				
+				// reinitialize connection
+				System.out.println("# Reinitializing database URL...");
+				conn = getConnection();
+				
+				hr(1);
+				
+				System.out.println("\n# Created a new database '" + DB_NAME + "' ");
+				
+				// create a new student table
+				createStudentTable();
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// CREATE DATABASE
+	}
+	
+	private boolean databaseExists(ResultSet res) throws SQLException{
+		while(res.next()) {
+			if(res.getString("TABLE_CAT").equalsIgnoreCase(DB_NAME)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
 	// CREATE STUDENT TABLE
 	private void createStudentTable() {
 		Statement 	stmt = null;
@@ -196,7 +262,6 @@ public class StudentDatabaseManager extends Database {
 	} // delete duplicate table
 
 	// FUNDAMENTAL DATABASE OPERATIONS ==========================================================================================================================
-	@Override
 	public boolean insertRecord(Student student) {
 		PreparedStatement pStmt = null;
 		
@@ -238,162 +303,289 @@ public class StudentDatabaseManager extends Database {
         return false;
 	}
 
-	@Override
 	public boolean deleteRecord(String studId) {
-		// TODO: deleteRecord()
-		// delete via studentId
+		PreparedStatement pStmt = null;
+		String SQL 				= null;
 		
 		try {
-			PreparedStatement pStmt = null;
-			
-			String SQL =	  "DELETE FROM " + databaseTableName 
-							+ "WHERE studId = ?";
+			SQL = "DELETE FROM " + databaseTableName + " WHERE studId=?";
 			
 			pStmt = conn.prepareStatement(SQL);
 			
 			// set the required parameter value
 			pStmt.setString(1, studId);
 			
-			pStmt.executeUpdate();
-			//ResultSet rs = pStmt.executeQuery(SQL);
+			int value = pStmt.executeUpdate();
 			
-			return true;
+			if(value >= 1) {
+				return true;
+			}
+			
+			hr(1);
 			
 		}catch(SQLException se){
-		//Handle errors for JDBC
-		//se.printStackTrace();
-		System.err.println(se.getMessage());
-		return false;
+			System.out.println("# Unable to delete student record...\n");
+			System.out.println("# delete student Error: SQL \n" + se.getMessage());
+			//se.printStackTrace();
+			
+			hr(1);
 		
 		}catch(Exception e){
-		 //Handle errors for Class.forName
-		 //e.printStackTrace();
-		System.err.println(e.getMessage());
-		return false;
+			System.err.println(e.getMessage());
+			//e.printStackTrace();
 		}
 		
+		return false;
 	}
 
-	@Override
-	public ResultSet readRecord(String studIdOrLastName) {
-		// TODO
-		/*Statement stmt 	= null;
-		String SQL 		= "SELECT * FROM " + databaseTableName;*/
+	public boolean searchStudent(String studIdOrLastName, boolean displayStudentRecord, String SQL, boolean searchByIdOnly) throws StudentNotFoundException {
+		PreparedStatement pStmt = null;
+		ResultSet res			= null;
 		
-		//student search via studentID or studentLastName
-		
-		try {
-			
-			PreparedStatement pStmt = null;
-			
-			String SQL =	  "SELECT FROM " + databaseTableName 
-							+ "WHERE studId = ? OR lastName = ?";
-			
+		try {			
+			// initialize SQL as prepared statement
 			pStmt = conn.prepareStatement(SQL);
 			
-			pStmt.setString(1, studIdOrLastName);
-			pStmt.setString(2, studIdOrLastName);
-			
-			pStmt.executeUpdate();
-			
-			ResultSet res = pStmt.executeQuery();
-			
-			if (res.next() == false) {
-				System.out.println("\nRecord not found");
+			// fill in prepared statement parameters
+			if(searchByIdOnly) {
+				pStmt.setString(1, studIdOrLastName); // ID ONLY		
+			} else {
+				pStmt.setString(1, studIdOrLastName); // ID
+				pStmt.setString(2, studIdOrLastName); // STUDENT ID
 			}
 			
-			else if (res.next() == true) {
-				System.out.println("\nRecord found! ");
-				System.out.println("\n\nID: " );
-			}
+			// execute search
+			res = pStmt.executeQuery();
 			
-			System.out.println("\nPlease wait . . . searching for student record " + studIdOrLastName);
-			
-			//if record found
-			
-			
-			
-			
-			//If resultset = null, print("Record not found") ??
-			
-			//ResultSet rs = 
-			
-		}catch(SQLException se){
-			//Handle errors for JDBC
-			//se.printStackTrace();
-			System.err.println(se.getMessage());
+			// returns true if a record exists
+			if (res.next()) {				
+				System.out.println("RECORD FOUND!");
 				
-		}catch(Exception e){
-			 //Handle errors for Class.forName
-			 //e.printStackTrace();
-			System.err.println(e.getMessage());
+				// if displayStudentRecord is true, print student record from View
+				if(displayStudentRecord) {
+					System.out.print("\n"); 
+					new View().printAStudentRecord(res);
+				}
+				
+				return true;
+				
+			} else {
+				throw new StudentNotFoundException();
+			}
+			
+		} catch(SQLException sqle){
+			System.out.println("Search Student Error: SQL ERROR \n" + sqle.getMessage());
+			// sqle.printStackTrace();
 		}
 		
-		return null;
+		return false;
 	}
 	
-	public void listAllByCourse(String course) {
-		// for command R, search by course 
-		
-		PreparedStatement pStmt = null;
-		ResultSet res 			= null;
-		String SQL				= null;
-		
-		try {
-			if (hasValidConnection()) {
-				
-               //----- course counter -----//
+	public void generateReports(String course) {
 
-                System.out.println("\nCreating a report for all " + course + " students:");
-                
-             // count the number of total students
-                SQL = "SELECT COUNT(*) AS courseCounter FROM " + databaseTableName + " WHERE course =?";
-                pStmt = conn.prepareStatement(SQL);
-                pStmt.setString(1, course);
-                res = pStmt.executeQuery();
-                
-                System.out.println("\nTotal number of " + course + " students: " + res.getInt("courseCounter"));
-                
-                System.out.println("\n\nList of students enrolled in " + course);
-                hr(2);
-				
-				// print all students
-				SQL = "SELECT * FROM " + databaseTableName + " WHERE course =?";				
-                pStmt = conn.prepareStatement(SQL);
-                pStmt.setString(1, course);
-                res = pStmt.executeQuery();
-                
- 
-                
-                for(int counter=1; res.next(); counter++) {
-                	System.out.println("\n[" + counter + "]");
-                	System.out.println("ID: " + res.getString("studId"));
-                	System.out.println("Name: " + res.getString("lastName")+", "+res.getString("firstName"));
-                	System.out.println("Course: " + res.getString("course"));
-                	System.out.println("Year Level: " + res.getString("yearLevel"));
-                	System.out.println("Units Enrolled: " + res.getString("unitsEnrolled"));
-                }
-                
-                hr(1);
-                
-               
-                // close resources
-               pStmt.close();
-               res.close();
-            }
+		PreparedStatement pStmt = null;
+		ResultSet res 			= null;
+		String SQL				= null;
+
+		// check if valid connection
+		if(hasValidConnection()) {
+			try {
+				switch (course) {
+					case "ALL":						
+						// count the number of students in each course
+						SQL = "SELECT COUNT(*) AS courseCount FROM " + databaseTableName + " WHERE course=?";
+	
+						String stmtParam = null;
+	
+						for(int counter=1; counter <= 3; counter++) {
+							switch(counter) {
+							case 1:
+								stmtParam = "SE";
+								break;
+							case 2:
+								stmtParam = "GD";
+								break;
+							case 3:
+								stmtParam = "WD";
+								break;
+							default: //skip
+								break;
+							}
+	
+							pStmt = conn.prepareStatement(SQL);
+							pStmt.setString(1, stmtParam);
+							res = pStmt.executeQuery();
+	
+							if(res.next()) {
+								System.out.println("# Total Students in " + stmtParam + ": " + res.getInt("courseCount"));
+							}
+						}
+	
+						System.out.print("\n");
+	
+						// list each students by course category
+						listStudentsByCourse(SQL, res, pStmt);
+	
+						hr(1);
+						pStmt.close();
+						res.close();
+					break;
+	
+	
+	
+					case "SE":
+						SQL = "SELECT COUNT(*) AS SE_STUDENTS FROM " + databaseTableName + " WHERE course=?";						
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "SE");
+						res = pStmt.executeQuery();
+	
+						if(res.next()) {
+							System.out.println("# Total Students in SE: " + res.getInt("SE_STUDENTS"));
+						}
+	
+						SQL = "SELECT * FROM " + databaseTableName + " WHERE course=?";
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "SE");
+						res = pStmt.executeQuery();
+	
+						for(int counter=1; res.next(); ++counter) {
+							System.out.println("\n[" + counter + "]");
+							new View().printAStudentRecord(res);
+						}
+	
+						hr(1);
+						
+						pStmt.close();
+						res.close();
+					break;
+	
+	
+	
+					case "GD":
+						SQL = "SELECT COUNT(*) AS GD_STUDENTS FROM " + databaseTableName + " WHERE course=?";
+	
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "GD");
+						res = pStmt.executeQuery();
+	
+						if(res.next()) {
+							System.out.println("# Total Students in GD: " + res.getInt("SE_STUDENTS"));
+						}
+	
+						SQL = "SELECT * FROM " + databaseTableName + " WHERE course=?";
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "GD");
+						res = pStmt.executeQuery();
+	
+						for(int counter=1; res.next(); ++counter) {
+							System.out.println("[" + counter + "]");
+							new View().printAStudentRecord(res);
+						}
+	
+						hr(1);
+						pStmt.close();
+						res.close();
+					break;
+	
+	
+	
+					case "WD":
+						SQL = "SELECT COUNT(*) AS WD_STUDENTS FROM " + databaseTableName + " WHERE course=?";
+	
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "WD");
+						res = pStmt.executeQuery();
+	
+						if(res.next()) {
+							System.out.println("# Total Students in WD: " + res.getInt("SE_STUDENTS"));
+						}
+	
+						SQL = "SELECT * FROM " + databaseTableName + " WHERE course=?";
+						pStmt = conn.prepareStatement(SQL);
+						pStmt.setString(1, "WD");
+						res = pStmt.executeQuery();
+	
+						for(int counter=1; res.next(); ++counter) {
+							System.out.println("[" + counter + "]");
+							new View().printAStudentRecord(res);
+						}
+	
+						hr(1);
+						pStmt.close();
+						res.close();
+					break;
+	
+					default: 
+						System.out.println("# Invalid Entry.");
+						//skip
+					break;
+
+				} // switch
 			
-		} catch(SQLException sqle) {
-			System.out.println("listAllStudentsByCourse Exception");
-			System.out.println("SQL ERROR: " + sqle.getMessage());
-		} catch(Exception e) {
-			System.out.println("ListAllStudentsByCourse Exception");
-			System.out.println("ERROR: " + e.getMessage());
-		}
+			} catch (SQLException sqle) {
+				System.out.println("SQL ERROR: " + sqle.getMessage());
+				System.out.println("# Failed to generate reports.");
+			} catch (Exception e) {
+				System.out.println("ERROR: " + e.getMessage());
+				System.out.println("# Failed to generate reports.");
+			}
+			
+			
+		} // if statement
+	} // Generate Report Method
+
+	public void listStudentsByCourse(String SQL, ResultSet res, PreparedStatement pStmt) throws SQLException {
 		
-		
+        SQL = "SELECT * FROM " + databaseTableName + " WHERE course=? ORDER BY lastName";
+        pStmt = conn.prepareStatement(SQL);
+        
+        for(int counter=1; counter <= 3; counter++) {
+        	switch(counter) {
+	        	case 1:
+	        		pStmt.setString(1, "SE");
+	        		res = pStmt.executeQuery();
+	        		System.out.println("--- SOFTWARE ENGINEERING(SE) ---");
+	        		
+        			for(int iterator=1; res.next(); iterator++) {
+        				System.out.println("\n[" + iterator + "]");
+        				new View().printAStudentRecord(res);
+        			}
+	        		
+	        		System.out.print("\n");
+	        		break;
+	        	case 2:
+	        		pStmt.setString(1, "GD");
+	        		res = pStmt.executeQuery();
+	        		System.out.println("--- GAME DEVELOPMENT(GD) ---");
+	        		
+	        		for(int iterator=1; res.next(); iterator++) {
+	            		System.out.println("\n[" + iterator + "]");
+	            		new View().printAStudentRecord(res);
+	            	}
+	        		
+	        		System.out.print("\n");
+	        		break;
+	        	case 3:
+	        		pStmt.setString(1, "WD");
+	        		res = pStmt.executeQuery();
+	        		System.out.println("--- WEB DEVELOPMENT(WD) ---");
+	        		
+	        		for(int iterator=1; res.next(); iterator++) {
+	            		System.out.println("\n[" + iterator + "]");
+	            		new View().printAStudentRecord(res);
+	            	}
+	        		
+	        		System.out.print("\n");
+	        		break;
+	        		
+	        	default: break;
+        	}
+        	
+        	
+        }
 	}
 	
-	public void listAll() {
+	public void listAllStudents() {
 		
 		PreparedStatement pStmt = null;
 		ResultSet res 			= null;
@@ -402,8 +594,7 @@ public class StudentDatabaseManager extends Database {
 		try {
 			if (hasValidConnection()) {
 				
-				System.out.println("\nList of Students enrolled: ");
-				System.out.println("\n==============");
+				System.out.println("List of students enrolled: ");
 				
 				// print all students
 				SQL = "SELECT * FROM " + databaseTableName;				
@@ -412,14 +603,8 @@ public class StudentDatabaseManager extends Database {
                 
                 for(int counter=1; res.next(); counter++) {
                 	System.out.println("\n[" + counter + "]");
-                	System.out.println("ID: " + res.getString("studId"));
-                	System.out.println("Name: " + res.getString("lastName")+", "+res.getString("firstName"));
-                	System.out.println("Course: " + res.getString("course"));
-                	System.out.println("Year Level: " + res.getString("yearLevel"));
-                	System.out.println("Units Enrolled: " + res.getString("unitsEnrolled"));
+                	new View().printAStudentRecord(res);
                 }
-                
-                hr(1);
                 
                 // count the number of total students
                 SQL = "SELECT COUNT(*) AS totalStudents FROM " + databaseTableName;
@@ -427,44 +612,45 @@ public class StudentDatabaseManager extends Database {
                 res = pStmt.executeQuery();
                 
                 if(res.next()) {
-                	System.out.println("Total Students Enrolled: " + res.getInt("totalStudents"));
-                	System.out.println();
+                	System.out.println("--------------------------------+");
+                	System.out.println("# Total Students Enrolled: " + res.getInt("totalStudents"));
+                	System.out.println("--------------------------------+");
                 }
-                
                 
                 // count the number of students in each course
                 SQL = "SELECT COUNT(*) AS courseCount FROM " + databaseTableName + " WHERE course=?";
-                String stmtParam = null;
-                
-                for(int counter=1; counter <= 3; counter++) {
-                	switch(counter) {
-                	case 1:
-                		stmtParam = "CS";
-                		break;
-                	case 2:
-                		stmtParam = "GD";
-                		break;
-                	case 3:
-                		stmtParam = "WD";
-                		break;
-            		default: //skip
-            			break;
-                	}
-                	                	
-                	pStmt = conn.prepareStatement(SQL);
-                	pStmt.setString(1, stmtParam);
-                	res = pStmt.executeQuery();
-                	
-                	if(res.next()) {
-                		System.out.println("Total Students in " + stmtParam + ": " + res.getInt("courseCount"));
-                	}
-                }
+            	
+				String stmtParam = null;
+
+				for(int counter=1; counter <= 3; counter++) {
+					switch(counter) {
+					case 1:
+						stmtParam = "SE";
+						break;
+					case 2:
+						stmtParam = "GD";
+						break;
+					case 3:
+						stmtParam = "WD";
+						break;
+					default: //skip
+						break;
+					}
+
+					pStmt = conn.prepareStatement(SQL);
+					pStmt.setString(1, stmtParam);
+					res = pStmt.executeQuery();
+
+					if(res.next()) {
+						System.out.println("# Total Students in " + stmtParam + ": " + res.getInt("courseCount"));
+					}
+				}
                 
                 hr(1);
                
                 // close resources
-               pStmt.close();
-               res.close();
+                pStmt.close();
+                res.close();
             }
 			
 		} catch(SQLException sqle) {
@@ -496,11 +682,24 @@ public class StudentDatabaseManager extends Database {
 		
 		
 	}
-	// ==========================================================================================================================================================
-	
 
+	
+	
+	// ==========================================================================================================================================================
+	// checks if student database manager has a valid connection
+		public boolean hasValidConnection() {
+			try {
+				if(conn.isValid(5)) {
+					return true;
+				} else {
+					return false;
+				}
+			} catch (Exception e) {
+				return false;
+			}
+		}
+		
 	// CLOSE ALL OPENED RESOURCES
-	@Override
 	public boolean terminateConnection() {
 		try {
 			// 1) validate connection
@@ -521,19 +720,7 @@ public class StudentDatabaseManager extends Database {
 		}
 		return false;
 	}
-	
-	// checks if student database manager has a valid connection
-	public boolean hasValidConnection() {
-		try {
-			if(conn.isValid(5)) {
-				return true;
-			} else {
-				return false;
-			}
-		}catch (Exception e) {
-			return false;
-		}
-	}
+
 	
 	
 	

@@ -7,7 +7,7 @@ import java.util.Scanner;
 import model.Student;
 import model.StudentDatabaseManager;
 import view.View;
-import exceptions.StudentNotFoundException;
+import exceptions.*;
 
 public class InputCommandFileReader {
 	
@@ -17,9 +17,10 @@ public class InputCommandFileReader {
 	private File inputCommandFile							= null;
 	private View view										= null;
 	private static Student student							= null;
+	private static String DB_TABLENAME						= null;
 
 	// CONSTRUCTOR
-	public InputCommandFileReader(String path, StudentDatabaseManager DatabaseManager) throws StudentNotFoundException {
+	public InputCommandFileReader(String path, StudentDatabaseManager DatabaseManager, String tableName) {
 		
 		// Initialize class variables
 		InputCommandFileReader.DatabaseManager	= DatabaseManager;
@@ -27,6 +28,7 @@ public class InputCommandFileReader {
 		this.fileName 			= path.substring(path.lastIndexOf('\\') + 1);
 		this.inputCommandFile	= new File(this.filePath);
 		this.view				= new View();
+		this.DB_TABLENAME		= tableName;
 		
 		// Print the path and file name
 		System.out.println("# FILE CONFIGURATION");
@@ -38,29 +40,13 @@ public class InputCommandFileReader {
 		readFile();
 	}
 	
-	public void printFileContents() {
-		try {
-			// TODO: Resource Leak: closeable value for Scanner
-			Scanner scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
-			
-			System.out.println("# Opening File...Please wait.");
-			System.out.println("# Printing file contents...");
-			
-			// print file contents using the view class
-			this.view.printFileContents(scanner, this.fileName);
-			
-		} catch (FileNotFoundException e) {
-			System.out.println("ERROR: File not found...");
-		}
-	}
-	
-	
-	public void readFile() throws StudentNotFoundException {
+	public void readFile() {
 		Scanner scanner = null;
 		
 		try {
-			// open file and set the delimitter to next line character ('\n')
 			// TODO: Resource Leak: closeable value for Scanner
+			
+			// open file and set the delimitter to next line character ('\n')
 			scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
 			
 			System.out.println("# Opening File...");
@@ -78,7 +64,7 @@ public class InputCommandFileReader {
 		}
 	}
 	
-	public void commandReader(Scanner scanner) throws StudentNotFoundException {
+	public void commandReader(Scanner scanner) {
 		String input = null;
 		boolean Quit = false; // to stop the loop
 		
@@ -94,7 +80,7 @@ public class InputCommandFileReader {
 				break;
 			case "S": //search and display
 				this.view.printUserEntry(input);
-				commandS();
+				commandS(scanner);
 				break;
 			case "D": //search and delete
 				this.view.printUserEntry(input);
@@ -122,8 +108,7 @@ public class InputCommandFileReader {
 	
 	// USER COMMANDS OPERATIONS ======================================================================================
 	private void commandA(Scanner scanner) {
-		
-		// determines the index of parameter being taken
+		// determines the INDEX of the parameter required
 		int parameterIndex;
 		
 		// temporary containers for student model fields
@@ -134,58 +119,101 @@ public class InputCommandFileReader {
 		int 	unitsEnrolled	= 0;
 		int 	yearLevel		= 0;
 		
-		// get all required inputs for each parameter
-		for(parameterIndex = 1; parameterIndex <= 6 && scanner.hasNext(); parameterIndex++) {
-			switch (parameterIndex) {
-			case 1: // id
-				studentId = scanner.next().trim();
-				break;
-			case 2: // last name
-				lastName = scanner.next().trim();
-				break;
-			case 3: // first name
-				firstName = scanner.next().trim();
-				break;
-			case 4: // course
-				course = scanner.next().trim();
-				break;
-			case 5: // year level
-				yearLevel = Integer.parseInt(scanner.next().trim());
-				break;
-			case 6: // units enrolled
-				unitsEnrolled = Integer.parseInt(scanner.next().trim());
-				break;
-				
-			default:
-				break;
+		try {
+			// get all required inputs for each parameter
+			for(parameterIndex = 1; parameterIndex <= 6 && scanner.hasNext(); parameterIndex++) {
+				switch (parameterIndex) {
+				case 1: // id
+					studentId = scanner.next().trim();
+					
+					char studId[] = studentId.toCharArray();
+					
+					if(studId.length != 11) {
+						throw new IDSizeNotValidException();
+					} else {
+						for(char letter : studId) {
+							if(!Character.isDigit(letter)) {
+								throw new IDFormatInvalidException();
+							}
+						}						
+					}
+					
+					
+					break;
+				case 2: // last name
+					lastName = scanner.next().trim();
+					break;
+				case 3: // first name
+					firstName = scanner.next().trim();
+					break;
+				case 4: // course
+					course = scanner.next().toString().trim();
+					
+					if(!course.equalsIgnoreCase("SE")) {
+						if(!course.equalsIgnoreCase("GD")) {
+							if(!course.equalsIgnoreCase("WD")) {
+								throw new CourseFormatInvalidException();
+							}
+						}
+					}
+					
+					break;
+				case 5: // year level
+					yearLevel = Integer.parseInt(scanner.next().trim());
+					break;
+				case 6: // units enrolled
+					unitsEnrolled = Integer.parseInt(scanner.next().trim());
+					break;
+					
+				default:
+					break;
+				}
 			}
+			
+			// create a new student object
+			student = new Student(
+					studentId,
+					lastName,
+					firstName,
+					course,
+					yearLevel,
+					unitsEnrolled
+			);
+			
+			// print the student
+			this.view.printStudent(student);
+			
+			System.out.println("\n# Created a new student!");
+			System.out.println("# Inserting student record into the database...");
+			
+			// insert student to database
+			DatabaseManager.insertRecord(student);
+			
+		} catch (IDFormatInvalidException e) {
+			System.out.println("ERROR: " + e.getMessage());
+			System.out.println("\n# Unable to create/add new record.");
+			System.out.println("# student ID must not have non-digit characters");
+			
+		} catch (IDSizeNotValidException e) {
+			System.out.println("ERROR: " + e.getMessage());
+			System.out.println("\n# Unable to create/add new record.");
+			System.out.println("# Student ID should be composed of 11 digits");
+			
+		} catch (CourseFormatInvalidException e) {
+			System.out.println("ERROR: " + e.getMessage());
+			view.printAllPossibleCourses();
+			System.out.println("# Unable to create/add new record.");
+			
+		} finally {
+			View.hr(1);
 		}
 		
-		// create a new student object
-		student = new Student(
-				studentId,
-				lastName,
-				firstName,
-				course,
-				yearLevel,
-				unitsEnrolled
-		);
-		
-		// TODO: check if the studentID is unique based on the records in the database table
-		// if not then its either throw a custom exception for duplicate student entry
-		// or overwrite the existing student record with the latest student record entry
 		
 		
-		// print the student
-		this.view.printStudent(student);
 		
-		System.out.println("\n# Created a new student!");
-		System.out.println("# Inserting student record into the database...");
 		
-		// insert student to database
-		DatabaseManager.insertRecord(student);
 		
-		View.hr(1);
+		
 	}
 	
 	private void commandQ(Scanner s) {
@@ -201,70 +229,58 @@ public class InputCommandFileReader {
 	}
 
 	private void commandR(Scanner scanner) {
-		// TODO Generate a report based on given criteria
-		// Criteria "ALL" or by specific course SE/GD/WD
-		String criteriaChoice = null;
+		String studentCourse = null;
 		
-		criteriaChoice = scanner.next().trim();
-		
-		switch (criteriaChoice) 
-		{
-			case "ALL":
-				//prints all??
-				DatabaseManager.listAll();
-				break;
+		if(scanner.hasNext()) {
+			studentCourse = scanner.next().toString().toUpperCase().trim(); // convert to String -> convert all to upper case -> trim trailing white space/s.
+			System.out.println(studentCourse + "\n");
+			DatabaseManager.generateReports(studentCourse);
+		}		
+	}
+
+	private void commandD(Scanner scanner) {
+		try {
+			String studId = scanner.next().trim();
 			
-			case "SE":
-				DatabaseManager.listAllByCourse("SE");
-				break;
-				
-			case "GD":
-				DatabaseManager.listAllByCourse("SE");
-				break;
+			System.out.println("# Please wait...");
+			System.out.println("# Searching for student ID \'" + studId + "\' \n");
 			
-			case "WD":
-				DatabaseManager.listAllByCourse("SE");
-				break;
+			String preparedStatement = "SELECT * FROM " + DB_TABLENAME + " WHERE studId=?";
 			
-			default: 
-				//skips
-				System.out.println("Error, criteria choice wrong");
-				break;
-		}	
+			// if true, it will proceed on deleting the studentRecord
+			if(DatabaseManager.searchStudent(studId, false, preparedStatement, true)) {
+				if(DatabaseManager.deleteRecord(studId)) {
+					View.deleteRecordsMessage();
+					View.hr(1);
+				}
+			}
+			
+		} catch (StudentNotFoundException snfe) {
+			System.out.println(snfe.getMessage());
+			View.hr(1);
+		}
 		
 	}
 
-	private void commandD(Scanner scanner)throws StudentNotFoundException {
-		// TODO Auto-generated method stub
-		// search and delete
-		String studId = null;
-		studId = scanner.next().trim();
-		
-		System.out.println("\nPlease wait . . . searching for student record " + studId);
-		boolean result = DatabaseManager.deleteRecord(studId);
-		
-		if (result == true)
-		{
-			//print message record deleted
-			View.deleteStudentRecordMessage();
-		}
-		else {
-			throw new StudentNotFoundException();
-		}
-			
-		
-		
-	}
-
-	private void commandS() {
-		// TODO Auto-generated method stub
+	private void commandS(Scanner scanner) {
 		// search a student entry via studentID or lastName and display full info
-		// readRecords()
-		
+		try {
+			String studIdOrLastName = scanner.next().toString().trim();
+			String preparedStatement = "SELECT * FROM " + DB_TABLENAME + " WHERE studId=? OR lastName=?";
+			
+			System.out.println("# Please wait...");
+			System.out.println("# Searching for student record \'" + studIdOrLastName + "\' \n");
+			
+			DatabaseManager.searchStudent(studIdOrLastName, true, preparedStatement, false);
+			View.hr(1);
+		} catch (StudentNotFoundException snfe) {
+			System.out.println(snfe.getMessage());
+			View.hr(1);
+		}
 	}
 
 	private void commandL() {
-		DatabaseManager.listAll();
+		DatabaseManager.listAllStudents();
 	}
 
 	
@@ -283,5 +299,21 @@ public class InputCommandFileReader {
 		DatabaseManager.insertRecord(student);
 		student = new Student("201546895", "Latoja", "Paolo", "BS SE", 4, 160);
 		DatabaseManager.insertRecord(student);
+	}
+	
+	public void printFileContents() {
+		try {
+			// TODO: Resource Leak: closeable value for Scanner
+			Scanner scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
+			
+			System.out.println("# Opening File...Please wait.");
+			System.out.println("# Printing file contents...");
+			
+			// print file contents using the view class
+			this.view.printFileContents(scanner, this.fileName);
+			
+		} catch (FileNotFoundException e) {
+			System.out.println("ERROR: File not found...");
+		}
 	}
 }

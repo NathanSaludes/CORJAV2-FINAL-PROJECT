@@ -1,5 +1,7 @@
 package view;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 import model.Student;
@@ -49,18 +51,19 @@ public class View {
 		
 	}
 	
-	public static void deleteStudentRecordMessage() {
+	public void deleteStudentRecordMessage() {
 		// deletes a specific student entry record
-		System.out.println("\nRecord found and successfully deleted");
+		System.out.println("# Student record successfully deleted!");
 	}
 
 	public static void deleteRecordsMessage() {
 		// Erases all records in the database
-		System.out.println("\nDatabase Table Records deleted");
+		System.out.println("\nDatabase Table Record deleted");
 	}
 	
 	public static void quitCommandMessage() {
 		// terminates the application
+		System.out.println("# Quitting...");
 		System.out.println("\nProgram terminated. Thank you for using the system.");
 		hr(2);
 	}
@@ -71,9 +74,10 @@ public class View {
 		System.out.println();
 	}
 	
-	public static void printAppConfig(String tableName, String inputFile, String logFile, Boolean defaultConfig) {
+	public static void printAppConfig(String DB_NAME, String tableName, String inputFile, String logFile, Boolean defaultConfig) {
 		System.out.println("# APP CONFIGURATION");
 		if(defaultConfig) {
+			System.out.println("(Default) STUDENT DATABASE NAME: " + DB_NAME);
 			System.out.println("(Default) STUDENT DATABASE TABLE NAME: " + tableName);
 			System.out.println("(Default) INPUT FILE PATH: \"" + inputFile + "\"");
 			System.out.println("(Default) LOG FILE PATH: \"" + logFile + "\"");			
@@ -84,6 +88,22 @@ public class View {
 		}
 	}
 	
+	
+	public void printAStudentRecord(ResultSet res) throws SQLException {
+		System.out.println("ID: " + res.getString("studId"));
+    	System.out.println("Name: " + res.getString("lastName")+", "+res.getString("firstName"));
+    	System.out.println("Course: " + res.getString("course"));
+    	System.out.println("Year Level: " + res.getString("yearLevel"));
+    	System.out.println("Units Enrolled: " + res.getString("unitsEnrolled"));
+	}
+	
+	public void printAllPossibleCourses() {
+		System.out.println("\n# List of Courses: ");
+		System.out.println("# [SE] - Software Engineering");
+		System.out.println("# [GD] - Game Development");
+		System.out.println("# [WD] - Web Development");
+		System.out.println("#");
+	}
 	
 	// DEBUGGING METHODS ===========================================================================================================================================
 	public void printFileContents(Scanner s, String fileName) {
@@ -116,8 +136,8 @@ public class View {
 					+ "__________________________________________________________________________________________________________________________");
 			break;
 		default:
-			System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-					+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+			System.out.println("+-----------------------------------------------------------------+"
+					+ "-----------------------------------------------------------------+-------------------------------------------------------+");
 			break;
 		}
 	}
