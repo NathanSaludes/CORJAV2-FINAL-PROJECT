@@ -1,7 +1,6 @@
 package model;
 
 import java.sql.*;
-import java.util.Scanner;
 
 import exceptions.StudentNotFoundException;
 import view.View;

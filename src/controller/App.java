@@ -10,7 +10,7 @@ public class App {
 	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testLogFile.txt";
 	
 	private static String JDBC_DRIVER	= "com.mysql.jdbc.Driver";
-	private static String DB_NAME		= "College";
+	private static String DB_NAME		= "default";
 	private static String DB_URL		= "jdbc:mysql://localhost:3306/";
 	public	static String DB_TABLENAME	= "students";
 	
@@ -18,12 +18,17 @@ public class App {
 		
 		// If main arguments are provided, it will override the application configurations
 		if(args.length == 3) {
-			DB_TABLENAME 	= args[0];
+			DB_NAME 		= args[0];
 			inputFilePath 	= args[1];
 			logFilePath 	= args[2];
 			
 			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, false);
 			
+		} else if(args.length == 2) {
+			inputFilePath 	= args[0];
+			logFilePath 	= args[1];
+			
+			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, false);
 		} else {
 			// If main arguments are not provided, the application will use the default configuration
 			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, true);
@@ -35,9 +40,8 @@ public class App {
 		handleInputCommandFileReader(databaseManager);			
 		
 	}
-
-
 	// ===========================================================================================================================================================
+	
 	// returns a student database manager object
 	public static StudentDatabaseManager handleDatabaseManager() {
 		StudentDatabaseManager database = new StudentDatabaseManager(
@@ -50,7 +54,7 @@ public class App {
 		return database;
 	}
 
-	// handles 
+	// handles the reading of input command file
 	@SuppressWarnings("static-access")
 	public static void handleInputCommandFileReader(StudentDatabaseManager DatabaseManager) {
 		
