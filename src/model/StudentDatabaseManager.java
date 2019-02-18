@@ -39,13 +39,14 @@ public class StudentDatabaseManager {
 		
 		hr(1);
 		
-		// 3) Establish a connection upon instantiation
+		// 3) Establish a connection upon instantiation	
+		System.out.println("# Connecting to database...");
 		conn = getConnection();
 		
+		hr(1);
 		
-		// 4) if connection is valid, create a new student table
 		if(hasValidConnection()) {
-			createStudentTable();
+			createDatabase(DB_NAME);			
 		}
 	}
 	
@@ -60,11 +61,9 @@ public class StudentDatabaseManager {
 			Class.forName(JDBC_DRIVER);
 				
 			// open a connection
-			System.out.println("# Connecting to database...");
 			databaseConnection = DriverManager.getConnection(DB_URL, "root", "");
 			
 			System.out.println("DATABASE CONNECTION STATUS: Valid");
-			hr(1);
 			
 		} catch (ClassNotFoundException cnfe) {
 			System.out.println("# CONNECTION ERROR: DRIVER\n");
@@ -95,6 +94,72 @@ public class StudentDatabaseManager {
 		return databaseConnection;
 	}
 	
+	// CREATE DATABASE
+	private void createDatabase(String DB_NAME) {
+		Statement stmt = null;
+		String SQL				= null;
+		DatabaseMetaData dbmd	= null;
+		ResultSet res			= null;
+		
+		// CHECK IF THERE IS EXISTING DATABASE NAME
+		try {			
+			dbmd = conn.getMetaData();
+			
+			res = dbmd.getCatalogs();
+			
+			// check if there is existing database else, create a new database
+			if(databaseExists(res)) {
+				this.DB_URL = DB_URL + DB_NAME;
+				
+				// reinitialize connection
+				System.out.println("# Reinitializing database URL...");
+				conn = getConnection();
+				
+				hr(1);
+				
+				// create a new student table
+				createStudentTable();
+			} else {
+				SQL = "CREATE DATABASE " + DB_NAME;
+				
+				stmt = conn.createStatement();
+				
+				stmt.executeUpdate(SQL);
+				
+				// update database URL
+				this.DB_URL = DB_URL + DB_NAME;
+				
+				
+				// reinitialize connection
+				System.out.println("# Reinitializing database URL...");
+				conn = getConnection();
+				
+				hr(1);
+				
+				System.out.println("\n# Created a new database '" + DB_NAME + "' ");
+				
+				// create a new student table
+				createStudentTable();
+			}
+			
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// CREATE DATABASE
+	}
+	
+	private boolean databaseExists(ResultSet res) throws SQLException{
+		while(res.next()) {
+			if(res.getString("TABLE_CAT").equalsIgnoreCase(DB_NAME)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
 	// CREATE STUDENT TABLE
 	private void createStudentTable() {
 		Statement 	stmt = null;
@@ -294,10 +359,13 @@ public class StudentDatabaseManager {
 			
 			// returns true if a record exists
 			if (res.next()) {				
-				System.out.println("RECORD FOUND!\n");
+				System.out.println("RECORD FOUND!");
 				
 				// if displayStudentRecord is true, print student record from View
-				if(displayStudentRecord) new View().printAStudentRecord(res);
+				if(displayStudentRecord) {
+					System.out.print("\n"); 
+					new View().printAStudentRecord(res);
+				}
 				
 				return true;
 				
@@ -538,14 +606,13 @@ public class StudentDatabaseManager {
                 	new View().printAStudentRecord(res);
                 }
                 
-                hr(1);
-                
                 // count the number of total students
                 SQL = "SELECT COUNT(*) AS totalStudents FROM " + databaseTableName;
                 pStmt = conn.prepareStatement(SQL);
                 res = pStmt.executeQuery();
                 
                 if(res.next()) {
+                	System.out.println("--------------------------------+");
                 	System.out.println("# Total Students Enrolled: " + res.getInt("totalStudents"));
                 	System.out.println("--------------------------------+");
                 }
