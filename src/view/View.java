@@ -51,9 +51,9 @@ public class View {
 		
 	}
 	
-	public static void deleteStudentRecordMessage() {
+	public void deleteStudentRecordMessage() {
 		// deletes a specific student entry record
-		System.out.println("\nRecord found and successfully deleted");
+		System.out.println("# Student record successfully deleted!");
 	}
 
 	public static void deleteRecordsMessage() {
@@ -63,6 +63,7 @@ public class View {
 	
 	public static void quitCommandMessage() {
 		// terminates the application
+		System.out.println("# Quitting...");
 		System.out.println("\nProgram terminated. Thank you for using the system.");
 		hr(2);
 	}
@@ -126,8 +127,8 @@ public class View {
 					+ "__________________________________________________________________________________________________________________________");
 			break;
 		default:
-			System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-					+ "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+			System.out.println("+-----------------------------------------------------------------+"
+					+ "-----------------------------------------------------------------+-------------------------------------------------------+");
 			break;
 		}
 	}

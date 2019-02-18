@@ -7,7 +7,7 @@ import java.util.Scanner;
 import model.Student;
 import model.StudentDatabaseManager;
 import view.View;
-import exceptions.StudentNotFoundException;
+import exceptions.*;
 
 public class InputCommandFileReader {
 	
@@ -17,9 +17,10 @@ public class InputCommandFileReader {
 	private File inputCommandFile							= null;
 	private View view										= null;
 	private static Student student							= null;
+	private static String databaseTableName					= null;
 
 	// CONSTRUCTOR
-	public InputCommandFileReader(String path, StudentDatabaseManager DatabaseManager) throws StudentNotFoundException {
+	public InputCommandFileReader(String path, StudentDatabaseManager DatabaseManager, String tableName) throws StudentNotFoundException {
 		
 		// Initialize class variables
 		InputCommandFileReader.DatabaseManager	= DatabaseManager;
@@ -27,6 +28,7 @@ public class InputCommandFileReader {
 		this.fileName 			= path.substring(path.lastIndexOf('\\') + 1);
 		this.inputCommandFile	= new File(this.filePath);
 		this.view				= new View();
+		this.databaseTableName	= tableName;
 		
 		// Print the path and file name
 		System.out.println("# FILE CONFIGURATION");
@@ -38,29 +40,13 @@ public class InputCommandFileReader {
 		readFile();
 	}
 	
-	public void printFileContents() {
-		try {
-			// TODO: Resource Leak: closeable value for Scanner
-			Scanner scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
-			
-			System.out.println("# Opening File...Please wait.");
-			System.out.println("# Printing file contents...");
-			
-			// print file contents using the view class
-			this.view.printFileContents(scanner, this.fileName);
-			
-		} catch (FileNotFoundException e) {
-			System.out.println("ERROR: File not found...");
-		}
-	}
-	
-	
-	public void readFile() throws StudentNotFoundException {
+	public void readFile() {
 		Scanner scanner = null;
 		
 		try {
-			// open file and set the delimitter to next line character ('\n')
 			// TODO: Resource Leak: closeable value for Scanner
+			
+			// open file and set the delimitter to next line character ('\n')
 			scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
 			
 			System.out.println("# Opening File...");
@@ -78,7 +64,7 @@ public class InputCommandFileReader {
 		}
 	}
 	
-	public void commandReader(Scanner scanner) throws StudentNotFoundException {
+	public void commandReader(Scanner scanner) {
 		String input = null;
 		boolean Quit = false; // to stop the loop
 		
@@ -94,7 +80,7 @@ public class InputCommandFileReader {
 				break;
 			case "S": //search and display
 				this.view.printUserEntry(input);
-				commandS();
+				commandS(scanner);
 				break;
 			case "D": //search and delete
 				this.view.printUserEntry(input);
@@ -122,8 +108,7 @@ public class InputCommandFileReader {
 	
 	// USER COMMANDS OPERATIONS ======================================================================================
 	private void commandA(Scanner scanner) {
-		
-		// determines the index of parameter being taken
+		// determines the INDEX of the parameter required
 		int parameterIndex;
 		
 		// temporary containers for student model fields
@@ -210,33 +195,43 @@ public class InputCommandFileReader {
 		}		
 	}
 
-	private void commandD(Scanner scanner)throws StudentNotFoundException {
-		// TODO Auto-generated method stub
-		// search and delete
-		String studId = null;
-		studId = scanner.next().trim();
-		
-		System.out.println("\nPlease wait . . . searching for student record " + studId);
-		boolean result = DatabaseManager.deleteRecord(studId);
-		
-		if (result == true)
-		{
-			//print message record deleted
-			View.deleteStudentRecordMessage();
-		}
-		else {
-			throw new StudentNotFoundException();
-		}
+	private void commandD(Scanner scanner) {
+		try {
+			String studId = scanner.next().trim();
 			
-		
+			System.out.println("# Please wait...");
+			System.out.println("# Searching for student ID \'" + studId + "\' \n");
+			
+			String preparedStatement = "SELECT * FROM " + databaseTableName + " WHERE studId=?";
+			
+			// if true, it will proceed on deleting the studentRecord
+			if(DatabaseManager.searchStudent(studId, false, preparedStatement, true)) {
+				if(DatabaseManager.deleteRecord(studId)) {
+					View.deleteRecordsMessage();
+				}
+			}
+			
+		} catch (StudentNotFoundException snfe) {
+			System.out.println(snfe.getMessage());
+			view.hr(1);
+		}
 		
 	}
 
-	private void commandS() {
-		// TODO Auto-generated method stub
+	private void commandS(Scanner scanner) {
 		// search a student entry via studentID or lastName and display full info
-		// readRecords()
-		
+		try {
+			String studIdOrLastName = scanner.next().toString().trim();
+			String preparedStatement = "SELECT * FROM " + databaseTableName + " WHERE studId=? OR lastName=?";
+			
+			System.out.println("# Please wait...");
+			System.out.println("# Searching for student record \'" + studIdOrLastName + "\' \n");
+			
+			DatabaseManager.searchStudent(studIdOrLastName, true, preparedStatement, false);
+			
+		} catch (StudentNotFoundException snfe) {
+			System.out.println(snfe.getMessage());
+		}
 	}
 
 	private void commandL() {
@@ -259,5 +254,21 @@ public class InputCommandFileReader {
 		DatabaseManager.insertRecord(student);
 		student = new Student("201546895", "Latoja", "Paolo", "BS SE", 4, 160);
 		DatabaseManager.insertRecord(student);
+	}
+	
+	public void printFileContents() {
+		try {
+			// TODO: Resource Leak: closeable value for Scanner
+			Scanner scanner = new Scanner(this.inputCommandFile).useDelimiter("\n");
+			
+			System.out.println("# Opening File...Please wait.");
+			System.out.println("# Printing file contents...");
+			
+			// print file contents using the view class
+			this.view.printFileContents(scanner, this.fileName);
+			
+		} catch (FileNotFoundException e) {
+			System.out.println("ERROR: File not found...");
+		}
 	}
 }

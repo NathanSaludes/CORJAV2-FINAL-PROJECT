@@ -1,8 +1,8 @@
 package exceptions;
 
 public interface Message {
-	String EXISTING_STUDENT = "\nStudent already exists in the database";
+	String EXISTING_STUDENT = "\nSTUDENT ALREADY EXISTS IN THE DATABASE!";
 		
-	String STUDENT_NOTFOUND = "\nStudent not found! ";
+	String STUDENT_NOTFOUND = "STUDENT NOT FOUND!";
 	
 }

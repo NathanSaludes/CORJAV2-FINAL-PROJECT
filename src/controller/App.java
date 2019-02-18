@@ -57,7 +57,7 @@ public class App {
 		
 		//before reading input command file, check if the database connection is valid.
 		if(DatabaseManager.hasValidConnection()) {
-			new InputCommandFileReader(inputFilePath, DatabaseManager);			
+			new InputCommandFileReader(inputFilePath, DatabaseManager, tableName);			
 		} else {
 			System.out.println("# Unable to read command file. invalid database connection.");
 			new View().quitCommandMessage();
