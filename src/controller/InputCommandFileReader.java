@@ -208,7 +208,10 @@ public class InputCommandFileReader extends View {
 									
 									// print the student
 									printer.printStudent(student);
+									logger.printAStudentRecord(student);
+									
 									printer.newStudentCreated();
+									
 									
 									// insert student to database
 									if(DatabaseManager.insertStudentRecord(student)) {

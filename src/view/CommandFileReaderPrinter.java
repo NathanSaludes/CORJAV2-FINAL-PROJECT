@@ -4,16 +4,19 @@ import model.Student;
 
 public class CommandFileReaderPrinter {
 	
+	private static CommandFileLogger logger = new CommandFileLogger();
+	
 	public void fileMetaData(String path, String name) {
 		System.out.println("# FILE CONFIGURATION");
 		System.out.println("PATH: " + path);
 		System.out.println("FILE NAME: " + name);
+		
+		logger.fileMetaData(path, name);
 	}
 	
 	public void commandPrinter(String input) {
-		// TODO: commandPrinter()
-		// reading <COMMAND> command...
 		System.out.println("# reading " + input + " command... \n");
+		logger.printUserEntry(input);
 	}
 	
 	public void FileReadingStatus(int process) {
@@ -24,21 +27,26 @@ public class CommandFileReaderPrinter {
 			case 0:
 				System.out.println("# Closing input file...");
 		}
+		
+		logger.FileReadingStatus(process);
 	}
 	
 	public void fileNotFound() {
 		System.out.println("# File not found!");
+		
+		logger.fileNotFound();
 	}
 	
 	public void printUserEntry(String input) {
 		System.out.println("COMMAND: " + input + "\n");
-		// System.out.println("# Reading command " + input + "...");
 		new CommandFileReaderPrinter().commandPrinter(input);
 	}
 	
 	public void invalidUserCommand(String input) {
 		System.out.println("# \'" + input + "\'");
 		System.out.println("# Invalid Command!");
+		
+		logger.invalidUserCommand(input);
 	}
 	
 	// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -46,26 +54,36 @@ public class CommandFileReaderPrinter {
 		System.out.println("ERROR: " + error);
 		System.out.println("\n# Unable to create/add new record.");
 		System.out.println("# student ID must not have non-digit characters");
+		
+		logger.invalidIdFormat(error);
 	}
 	
 	public void invalidIdLength(String error) {
 		System.out.println("ERROR " + error);
 		System.out.println("\n# Unable to create/add new record.");
 		System.out.println("# Student ID should be composed of 11 digits");
+		
+		logger.invalidIdLength(error);
 	}
 	
 	public void invalidCourseFormat(String error) {
 		System.out.println("ERROR: " + error);
 		new View().printAllPossibleCourses();
 		System.out.println("# Unable to create/add new record.");
+		
+		logger.invalidCourseFormat(error);
 	}
 	
 	public void studentNotFound() {
 		System.out.println("# Student not found.");
+		
+		logger.studentNotFound();
 	}
 	
 	public void printRecordFound() {
 		System.out.println("RECORD FOUND!\n");
+		
+		logger.printRecordFound();
 	}
 	
 	
@@ -77,6 +95,7 @@ public class CommandFileReaderPrinter {
 	// COMMAND A ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 	public void newStudentCreated() {
 		System.out.println("# Created a new student!");
+		logger.newStudentCreated();
 	}
 	
 	public void databaseInsertStudent(boolean success) {
@@ -87,6 +106,8 @@ public class CommandFileReaderPrinter {
 		} else {
 			System.out.println("# Failed to insert student record into the database.");			
 		}
+		
+		logger.databaseInsertStudent(success);
 	}
 	
 	public void printStudent(Student s) {
@@ -100,11 +121,15 @@ public class CommandFileReaderPrinter {
 	
 	public void addStudentError() {
 		System.out.println("# Unable to add new student.");
+		
+		logger.addStudentError();
 	}
 	
 	// COMMAND R ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 	public void invalidParameterArgument() {
 		System.out.println("# Invalid R Command.");
+		
+		logger.invalidParameterArgument();
 	}
 	
 	public void generateStudentReport(Student[] stud, String course) {
@@ -114,6 +139,8 @@ public class CommandFileReaderPrinter {
 			System.out.println("[" + (counter+1) + "]");
 			printStudent(stud[counter]);
 		}
+		
+		logger.generateStudentReport(stud, course);
 	}
 	
 	public void generateStudentReport(Object[] courses) {		
@@ -162,39 +189,55 @@ public class CommandFileReaderPrinter {
 			System.out.println("[" + (counter+1) + "]");
 			printStudent(WD[counter]);
 		}
+		
+		logger.generateStudentReport(courses);
 	}
 
 	public void printGenerateReportError() {
 		System.out.println("# Unable to generate report");
+		
+		logger.printGenerateReportError();
 	}
 	
 	// COMMAND D ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 	public void searchStudentRecordsById(String id) {
 		System.out.println("# Searching for student with an id \'" + id + "\'");
 		System.out.println("# Please wait...\n");
+		
+		logger.searchStudentRecordsById(id);
 	}
 	
 	public void deleteRecordsMessage() {
 		System.out.println("\n# Student record deleted!");
+		
+		logger.deleteRecordsMessage();
 	}
 
 	public void deleteError() {
-		System.out.println("# Unable to delete student record...\n");		
+		System.out.println("# Unable to delete student record...\n");	
+		
+		logger.deleteError();
 	}
 	
 	public void searchByIdError() {
 		System.out.println("# Unable to perform search by id.");
+		
+		logger.searchByIdError();
 	}
 	
 	// COMMAND Q ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 	public void quitCommandMessage() {
 		// terminates the application
 		System.out.println("\n# Quitting...");
+		
+		logger.quitCommandMessage();
 	}
 	
 	// COMMAND P ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 	public void startPurgeCommand() {
 		System.out.println("# Deleting all records...Please wait.");
+		
+		logger.startPurgeCommand();
 	}
 	
 	public void tableCleared(boolean success) {
@@ -204,22 +247,28 @@ public class CommandFileReaderPrinter {
 			System.out.println("# Unable to clear student database table records");
 		}
 		
+		logger.tableCleared(success);
 	}
 	
 	// COMMAND S ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 	public void searchStudentRecords(String idOrlastName) {
 		System.out.println("# Searching for student record \'" + idOrlastName + "\'");
 		System.out.println("# Please wait...\n");
+		
+		logger.searchStudentRecords(idOrlastName);
 	}
 	
 	public void searchError() {
 		System.out.println("# Unable to perform search student record.");
+		
+		logger.searchError();
 	}
 
 	// COMMAND L ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 	public void listAllStudentsError() {
 		System.out.println("# Unable to list all student records.");
 		
+		logger.listAllStudentsError();
 	}
 	
 	public void listAllStudents(Object[] courses) {
@@ -275,6 +324,8 @@ public class CommandFileReaderPrinter {
 		System.out.println("Total number of SE students: " + SE.length);
 		System.out.println("Total number of GD students: " + GD.length);
 		System.out.println("Total number of WD students: " + WD.length);
+		
+		logger.listAllStudents(courses);
 	}
 	
 	

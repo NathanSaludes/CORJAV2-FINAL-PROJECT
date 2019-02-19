@@ -3,6 +3,7 @@ package controller;
 import java.sql.*;
 
 import model.StudentDatabaseManager;
+import view.LogFileWriter;
 import view.View;
 
 public class App {
@@ -15,6 +16,8 @@ public class App {
 	private static String DB_NAME		= "iacademy";
 	private static String DB_URL		= "jdbc:mysql://localhost:3306/";
 	public	static String DB_TABLENAME	= "students";
+	
+	public static LogFileWriter logger = new LogFileWriter();
 	
 	public static void main(String[] args) {
 		
@@ -37,15 +40,20 @@ public class App {
 			View.hr(1);
 		}
 		
-		View view = new View(); 
+		View view = new View();
 		
 		handleDatabaseManager(view);
 		
 		View.hr(2);
 		view.programEnd();
+		
+		// print to log file
+		logger.logFile(logFilePath);
 	}
 
 	
+
+
 	public static void handleDatabaseManager(View view) {
 		
 		StudentDatabaseManager databaseManager = new StudentDatabaseManager(
