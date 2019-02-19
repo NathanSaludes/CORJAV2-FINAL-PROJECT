@@ -51,7 +51,6 @@ public class InputCommandFileReader extends View {
 			printer.FileReadingStatus(1);
 			hr(2);
 			
-			
 			// read user commands
 			commandReader(scanner);
 			

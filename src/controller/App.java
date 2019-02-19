@@ -35,7 +35,7 @@ public class App {
 			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, false);
 			View.hr(1);
 			
-		} else if(args.length < 2) {
+		} else {
 			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, true);
 			View.hr(1);
 		}
@@ -47,7 +47,7 @@ public class App {
 		View.hr(2);
 		view.programEnd();
 		
-		// print to log file
+		// print StringBuilder contents to log file
 		logger.logFile(logFilePath);
 	}
 
@@ -66,9 +66,9 @@ public class App {
 		String conn = databaseManager.initializeConnection();
 		
 		view.printDatabaseConfig(
-				databaseManager.getJDBC_DRIVER(), 
-				databaseManager.getDB_NAME(), 
-				databaseManager.getDB_URL()
+			databaseManager.getJDBC_DRIVER(), 
+			databaseManager.getDB_NAME(), 
+			databaseManager.getDB_URL()
 		);
 		
 		View.hr(1);

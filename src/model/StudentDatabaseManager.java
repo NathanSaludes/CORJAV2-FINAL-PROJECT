@@ -371,7 +371,7 @@ public class StudentDatabaseManager {
 							
 							if(numberOfRows > 0) {
 								GD = new Student[numberOfRows];
-
+								
 								pStmt = conn.prepareStatement(SQL2);
 								pStmt.setString(1, "GD");
 								res = pStmt.executeQuery();

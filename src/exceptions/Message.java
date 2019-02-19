@@ -9,6 +9,5 @@ public interface Message {
     
     String INVALID_ID_FORMAT = "Invalid Student ID Format! ";
     
-    String INVALID_COURSE_FORMAT = "Invalid Course Name/Format.";
-	
+    String INVALID_COURSE_FORMAT = "Invalid Course Name/Format.";	
 }
