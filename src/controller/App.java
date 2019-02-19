@@ -1,5 +1,7 @@
 package controller;
 
+import java.sql.*;
+
 import model.StudentDatabaseManager;
 import view.View;
 
@@ -10,13 +12,13 @@ public class App {
 	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testLogFile.txt";
 	
 	private static String JDBC_DRIVER	= "com.mysql.jdbc.Driver";
-	private static String DB_NAME		= "default";
+	private static String DB_NAME		= "iacademy";
 	private static String DB_URL		= "jdbc:mysql://localhost:3306/";
 	public	static String DB_TABLENAME	= "students";
 	
 	public static void main(String[] args) {
 		
-		// If main arguments are provided, it will override the application configurations
+		// NOTE: application will use the default configurations if no arguments are provided
 		if(args.length == 3) {
 			DB_NAME 		= args[0];
 			inputFilePath 	= args[1];
@@ -29,41 +31,97 @@ public class App {
 			logFilePath 	= args[1];
 			
 			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, false);
-		} else {
-			// If main arguments are not provided, the application will use the default configuration
+			
+		} else if(args.length < 2) {
 			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, true);
+			View.hr(1);
 		}
 		
-		// create a database manager
-		StudentDatabaseManager databaseManager = handleDatabaseManager();
+		View view = new View(); 
 		
-		handleInputCommandFileReader(databaseManager);			
+		handleDatabaseManager(view);
 		
+		View.hr(2);
+		view.programEnd();
 	}
-	// ===========================================================================================================================================================
+
 	
-	// returns a student database manager object
-	public static StudentDatabaseManager handleDatabaseManager() {
-		StudentDatabaseManager database = new StudentDatabaseManager(
+	public static void handleDatabaseManager(View view) {
+		
+		StudentDatabaseManager databaseManager = new StudentDatabaseManager(
 			JDBC_DRIVER,
 			DB_NAME, 
 			DB_URL, 
 			DB_TABLENAME
 		);
 		
-		return database;
+		String conn = databaseManager.initializeConnection();
+		
+		view.printDatabaseConfig(
+				databaseManager.getJDBC_DRIVER(), 
+				databaseManager.getDB_NAME(), 
+				databaseManager.getDB_URL()
+		);
+		
+		View.hr(1);
+		
+		switch(conn) {
+			case "Driver Error":
+				view.cannotLoadDriver();
+				break;
+				
+			case "SQL Error":
+				view.cannotConnectToDatabase();
+				break;
+				
+			case "Connected":
+				
+				if (databaseManager.hasValidConnection()) {
+					if(databaseManager.createDatabase(DB_NAME)) {
+						int result = databaseManager.deleteDuplicateTable();
+						if(result == 0) {
+							view.alertCreateNewTable(DB_TABLENAME);
+							View.hr(1);
+							
+							if(databaseManager.createStudentTable()) {
+								handleInputCommandFileReader(databaseManager, view);						
+							} else {
+								view.createNewTable(false, DB_TABLENAME);
+							}
+							
+						} else if (result == 1) {
+							view.alertDuplicateTableDeleted(DB_TABLENAME);
+							view.tableDeleted(DB_TABLENAME);
+							view.alertCreateNewTable(DB_TABLENAME);
+							View.hr(1);
+							
+							if(databaseManager.createStudentTable()) {
+								handleInputCommandFileReader(databaseManager, view);						
+							} else {
+								view.createNewTable(false, DB_TABLENAME);
+							}
+							
+						} else if (result == -1) {
+							view.failedToDeleteAnExistingTable(DB_TABLENAME);
+							View.hr(1);
+						}
+					} else {
+						view.failedToCreateDatabase();
+					}
+				} else {
+					view.cannotConnectToDatabase();
+				}
+				
+				break;
+		}
 	}
 
-	// handles the reading of input command file
-	@SuppressWarnings("static-access")
-	public static void handleInputCommandFileReader(StudentDatabaseManager DatabaseManager) {
+	public static void handleInputCommandFileReader(StudentDatabaseManager DatabaseManager, View view) {
 		
-		//before reading input command file, check if the database connection is valid.
 		if(DatabaseManager.hasValidConnection()) {
 			new InputCommandFileReader(inputFilePath, DatabaseManager, DB_TABLENAME);			
 		} else {
-			System.out.println("# Unable to read command file. invalid database connection.");
-			new View().quitCommandMessage();
+			view.cannotReadCommandFile();
 		}
 		
 	}

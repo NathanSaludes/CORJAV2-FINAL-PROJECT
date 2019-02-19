@@ -8,72 +8,8 @@ import model.Student;
 
 public class View {
 
-	public void printStudent(Student s) {
-		// commandA
-		System.out.println("last name: " + s.getLastName());
-		System.out.println("first name: " + s.getFirstName());
-		System.out.println("student id: " + s.getStudentId());
-		System.out.println("course: " + s.getCourse());
-		System.out.println("year level: " + s.getYearLevel());
-		System.out.println("units enrolled: " + s.getUnitsEnrolled());
-	}
-	
-	public void commandL() {
-		
-	}
-	
-	public void commandS(String studentLastNameOrID) {
-		// searches for a student entry in the database and displays information
-		// search options are: studentID or studentLastName
-		
-		
-		System.out.println("\nReading command . . . . "); //maybe this is before function calls
-		System.out.println("\nPlease wait. . . searching for student record " + studentLastNameOrID);
-		
-		//if record found, show records for that student. Else, records not found or error/exception input
-	}
-	
-	public static void searchAndDeleteFoundMessage(String studentID) {
-		System.out.println("\nStudent record " + studentID + " found and successfully deleted!");
-	}
-	
-	public static void searchAndDeleteNotFoundMessage(String studentID) {
-		// commandD
-		// if found, print otherwise search then show error message
-		System.out.println("\nStudent record " + studentID + " not found");
-		
-	}
-	
-	public static void generateReportMessage() {
-		// generates report option based on the given criteria
-		// criterias: ALL or Course
-		// commandR
-		
-	}
-	
-	public void deleteStudentRecordMessage() {
-		// deletes a specific student entry record
-		System.out.println("# Student record successfully deleted!");
-	}
 
-	public static void deleteRecordsMessage() {
-		// Erases all records in the database
-		System.out.println("\nDatabase Table Record deleted");
-	}
-	
-	public static void quitCommandMessage() {
-		// terminates the application
-		System.out.println("# Quitting...");
-		System.out.println("\nProgram terminated. Thank you for using the system.");
-		hr(2);
-	}
-	
-	public void printUserEntry(String input) {
-		System.out.println("COMMAND: " + input);
-		// System.out.println("# Reading command " + input + "...");
-		System.out.println();
-	}
-	
+	// APP	
 	public static void printAppConfig(String DB_NAME, String tableName, String inputFile, String logFile, Boolean defaultConfig) {
 		System.out.println("# APP CONFIGURATION");
 		if(defaultConfig) {
@@ -88,13 +24,68 @@ public class View {
 		}
 	}
 	
+	public void cannotReadCommandFile() {
+		System.out.println("# Unable to read command file.");
+	}
 	
-	public void printAStudentRecord(ResultSet res) throws SQLException {
-		System.out.println("ID: " + res.getString("studId"));
-    	System.out.println("Name: " + res.getString("lastName")+", "+res.getString("firstName"));
-    	System.out.println("Course: " + res.getString("course"));
-    	System.out.println("Year Level: " + res.getString("yearLevel"));
-    	System.out.println("Units Enrolled: " + res.getString("unitsEnrolled"));
+	public void programEnd() {
+		System.out.println("# Program Terminated. Thank you for using the program!");
+	}
+	
+	public void printDatabaseConfig(String JDBC_DRIVER, String DB_NAME, String DB_URL) {
+		System.out.println("# DATABASE CONFIGURATION");
+		System.out.println("JDBC_DRIVER: " 	+ JDBC_DRIVER);
+		System.out.println("DB_NAME: "		+ DB_NAME);
+		System.out.println("DB_URL: "		+ DB_URL);
+	}
+	
+	public void cannotLoadDriver() {
+		System.out.println("# Unable to load JDBC driver");
+	}
+	
+	public void cannotConnectToDatabase() {
+		System.out.println("# Unable to connect to the database. Invalid Connection.");
+	}
+	
+	public void failedToCreateDatabase() {
+		System.out.println("# Failed to create a new database.");
+		
+	}
+	
+	public void createNewTable(Boolean success, String tableName) {
+		if(success) {
+			System.out.println("# Successfully created `" + tableName.toLowerCase() + "` table!");
+		} else {
+			System.out.println("# Failed to create `" + tableName.toLowerCase() + "` table. ");			
+		}
+	}
+	
+	public void alertCreateNewTable(String tableName) {
+		System.out.println("# Creating new table `" + tableName.toLowerCase() + "`");
+	}
+	
+	public void alertDuplicateTableDeleted(String tableName) {
+		System.out.println("# Found an existing duplicate table `" + tableName.toLowerCase() + "`");
+	}
+	
+	public void failedToDeleteAnExistingTable(String tableName) {
+		System.out.println("# Failed to delete a duplicate table, `" + tableName + "`");
+		
+	}
+	
+	public void tableDeleted(String tableName) {
+		System.out.println("# Dropped an existing table `" + tableName.toLowerCase() + "`");
+	}
+	
+	// ---------------------------------------------------------------------------------------------------------------------
+	
+	
+	public void printAStudentRecord(Student stud) {
+		System.out.println("ID: " + stud.getStudentId());
+    	System.out.println("Name: " + stud.getLastName() + ", " + stud.getFirstName());
+    	System.out.println("Course: " + stud.getCourse());
+    	System.out.println("Year Level: " + stud.getYearLevel());
+    	System.out.println("Units Enrolled: " + stud.getUnitsEnrolled());
 	}
 	
 	public void printAllPossibleCourses() {
@@ -105,7 +96,11 @@ public class View {
 		System.out.println("#");
 	}
 	
-	// DEBUGGING METHODS ===========================================================================================================================================
+	
+	
+	
+	
+	// FOR DEBUGGING -----------------------------------------------------------------------------------------------------------------------------------------------
 	public void printFileContents(Scanner s, String fileName) {
 		hr(1);
 		System.out.println("# FILE: " + fileName + "\n");
@@ -120,7 +115,7 @@ public class View {
 	
 
 	
-	// PRINTS HORIZONTAL RULE
+	// PRINTS HORIZONTAL RULE -------------------------------------------------------------------------------------------------------------------------------------
 	public static void hr(int style) {
 		switch(style) {
 		case 1:
@@ -141,4 +136,12 @@ public class View {
 			break;
 		}
 	}
+
+	
+
+	
+
+	
+
+	
 }
