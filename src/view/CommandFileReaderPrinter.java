@@ -147,7 +147,6 @@ public class CommandFileReaderPrinter {
 		Student[] SE = new Student[0];
 		Student[] GD = new Student[0];
 		Student[] WD = new Student[0];
-		int totalNumberOfStudents = SE.length + GD.length + WD.length;
 		
 		for(int counter=0; counter < courses.length; ++counter) {
 			switch(counter) {
@@ -165,6 +164,8 @@ public class CommandFileReaderPrinter {
 				break;
 			}
 		}
+		
+		int totalNumberOfStudents = SE.length + GD.length + WD.length;
 		
 		System.out.println("# Creating a report for all students... \n");
 		
