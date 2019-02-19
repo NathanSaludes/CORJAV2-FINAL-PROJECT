@@ -32,6 +32,7 @@ private static CommandFileLogger logger = new CommandFileLogger();
 	
 	public void printUserEntry(String input) {
 		println("COMMAND: " + input + endl);
+		println("# reading " + input + " command..." + endl);
 	}
 	
 	public void invalidUserCommand(String input) {

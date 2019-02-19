@@ -1,7 +1,5 @@
 package controller;
 
-import java.sql.*;
-
 import model.StudentDatabaseManager;
 import view.LogFileWriter;
 import view.View;
@@ -10,10 +8,10 @@ public class App {
 	
 	// DEFAULT APP CONFIG
 	public static String inputFilePath 	= "C:\\Users\\Nathaniel Saludes\\Desktop\\input.dat";
-	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\testLogFile.txt";
+	public static String logFilePath	= "C:\\Users\\Nathaniel Saludes\\Desktop\\SRDBMS.dat";
 	
 	private static String JDBC_DRIVER	= "com.mysql.jdbc.Driver";
-	private static String DB_NAME		= "iacademy";
+	private static String DB_NAME		= "corjav2";
 	private static String DB_URL		= "jdbc:mysql://localhost:3306/";
 	public	static String DB_TABLENAME	= "students";
 	
@@ -28,12 +26,14 @@ public class App {
 			logFilePath 	= args[2];
 			
 			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, false);
+			View.hr(1);
 			
 		} else if(args.length == 2) {
 			inputFilePath 	= args[0];
 			logFilePath 	= args[1];
 			
 			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, false);
+			View.hr(1);
 			
 		} else if(args.length < 2) {
 			View.printAppConfig(DB_NAME, DB_TABLENAME, inputFilePath, logFilePath, true);
